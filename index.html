@@ -1044,339 +1044,141 @@
         <p class="footer-text">Crafted with Jaggery & Love</p>
     </footer>
 
-    <script>
-        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+<script>
+        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-        // Force video play on page load
-        window.addEventListener('DOMContentLoaded', function() {
-            const video = document.querySelector('.hero-video');
-            if (video) {
-                video.play().catch(err => {
-                    console.log('Video autoplay failed:', err);
-                });
-            }
-        });
+        // Force video play on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const video = document.querySelector('.hero-video');
+            if (video) {
+                video.play().catch(err => {
+                    console.log('Video autoplay failed:', err);
+                });
+            }
+        });
 
-        // Check if mobile/tablet
-        const isMobile = window.innerWidth < 768;
-        const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
-        const isDesktop = window.innerWidth >= 1024;
+        // Check if mobile/tablet
+        const isMobile = window.innerWidth < 768;
+        const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
+        const isDesktop = window.innerWidth >= 1024;
 
-        // Mobile Menu Toggle
-        const menuToggle = document.querySelector('.menu-toggle');
-        const navLinks = document.querySelector('.nav-links');
-        const navItems = document.querySelectorAll('.nav-links a');
+        // Mobile Menu Toggle
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
 
-        menuToggle.addEventListener('click', () => {
-            menuToggle.classList.toggle('active');
-            navLinks.classList.toggle('active');
-            
-            // Animate menu toggle
-            gsap.to(menuToggle, {
-                scale: menuToggle.classList.contains('active') ? 1.1 : 1,
-                duration: 0.3,
-                ease: 'back.out(2)'
-            });
-        });
-
-        navItems.forEach(item => {
-            item.addEventListener('click', () => {
-                menuToggle.classList.remove('active');
-                navLinks.classList.remove('active');
-            });
-        });
-
-        // Custom Cursor (Desktop Only)
-        if (isDesktop) {
-            const cursor = document.querySelector('.cursor');
-            const follower = document.querySelector('.cursor-follower');
-
-            document.addEventListener('mousemove', (e) => {
-                gsap.to(cursor, { duration: 0.1, x: e.clientX, y: e.clientY });
-                gsap.to(follower, { duration: 0.3, x: e.clientX, y: e.clientY });
-            });
-
-            // Cursor grow on hover
-            document.querySelectorAll('a, button, .card, .menu-item, .gallery-item').forEach(el => {
-                el.addEventListener('mouseenter', () => {
-                    gsap.to(cursor, { scale: 2, duration: 0.3 });
-                    gsap.to(follower, { scale: 1.5, duration: 0.3 });
-                });
-                el.addEventListener('mouseleave', () => {
-                    gsap.to(cursor, { scale: 1, duration: 0.3 });
-                    gsap.to(follower, { scale: 1, duration: 0.3 });
-                });
-            });
-        }
-
-        // Preloader Animation
-        const preloaderTl = gsap.timeline();
-        preloaderTl
-            .to('.preloader-text', {
-                scale: 1.3,
-                opacity: 0,
-                duration: 1,
-                delay: 1.5,
-                ease: 'power2.in'
-            })
-            .to('.preloader', {
-                y: '-100%',
-                duration: 1,
-                ease: 'power4.inOut'
-            }, '-=0.3');
-
-        // Hero animations
-        const heroTl = gsap.timeline({ delay: 2.5 });
-        heroTl
-            .from('.hero-title', {
-                y: isMobile ? 50 : 100,
-                opacity: 0,
-                duration: 1.2,
-                ease: 'power4.out'
-            })
-            .from('.hero-subtitle', {
-                y: isMobile ? 30 : 50,
-                opacity: 0,
-                duration: 0.8,
-                ease: 'power3.out'
-            }, '-=0.6')
-            .from('.scroll-indicator', {
-                opacity: 0,
-                y: -20,
-                duration: 0.8
-            }, '-=0.4');
-
-        // Floating elements animation (Desktop only)
-        if (isDesktop) {
-            gsap.to('.float-1', {
-                y: 50,
-                x: 30,
-                rotation: 90,
-                duration: 8,
-                repeat: -1,
-                yoyo: true,
-                ease: 'sine.inOut'
-            });
-
-            gsap.to('.float-2', {
-                y: -40,
-                x: -20,
-                rotation: -60,
-                duration: 10,
-                repeat: -1,
-                yoyo: true,
-                ease: 'sine.inOut'
-            });
-        }
-
-        // Parallax video (Desktop only) - Scroll with page until video ends
-        if (isDesktop) {
-            gsap.to('.hero-video', {
-                scrollTrigger: {
-                    trigger: '.hero',
-                    start: 'top top',
-                    end: 'bottom top',
-                    scrub: 1
-                },
-                y: 400,
-                scale: 1.2,
-                ease: 'none'
-            });
-        } else {
-            // Mobile/Tablet - subtle parallax
-            gsap.to('.hero-video', {
-                scrollTrigger: {
-                    trigger: '.hero',
-                    start: 'top top',
-                    end: 'bottom top',
-                    scrub: 1
-                },
-                y: 200,
-                ease: 'none'
-            });
-        }
-
-        // Cards animation with enhanced mobile effects
-        gsap.utils.toArray('.card').forEach((card, i) => {
-            const animation = {
-                scrollTrigger: {
-                    trigger: card,
-                    start: 'top 85%',
-                    toggleActions: 'play none none reverse'
-                },
-                y: isMobile ? 60 : 100,
-                opacity: 0,
-                rotation: isMobile ? 0 : 5,
-                scale: isMobile ? 0.9 : 1,
-                duration: isMobile ? 0.8 : 1,
-                delay: i * (isMobile ? 0.1 : 0.2),
-                ease: 'power3.out'
-            };
-            gsap.from(card, animation);
-        });
-
-        // Gallery items with stagger
-        const galleryAnimation = {
-            scrollTrigger: {
-                trigger: '.gallery-grid',
-                start: 'top 80%'
-            },
-            scale: isMobile ? 0.9 : 0.8,
-            opacity: 0,
-            y: isMobile ? 40 : 0,
-            stagger: isMobile ? 0.15 : 0.2,
-            duration: isMobile ? 0.7 : 1,
-            ease: 'power2.out'
-        };
-        gsap.from('.gallery-item', galleryAnimation);
-
-        // Menu items wave animation
-        gsap.from('.menu-item', {
-            scrollTrigger: {
-                trigger: '.menu',
-                start: 'top 75%'
-            },
-            y: isMobile ? 40 : 60,
-            opacity: 0,
-            stagger: {
-                amount: isMobile ? 0.6 : 0.8,
-                from: 'start',
-                ease: 'power2.out'
-            },
-            duration: isMobile ? 0.6 : 0.8,
-            ease: 'back.out(1.2)'
-        });
-
-        // Split section parallax (Desktop/Tablet only)
-        if (!isMobile) {
-            gsap.to('.split-image', {
-                scrollTrigger: {
-                    trigger: '.split-section',
-                    start: 'top bottom',
-                    end: 'bottom top',
-                    scrub: 1
-                },
-                y: -80
-            });
-        }
-
-        // Section titles reveal
-        gsap.utils.toArray('.section-title').forEach(title => {
-            const words = title.textContent.split(' ');
-            title.innerHTML = words.map(word => `<span style="display: inline-block; overflow: hidden;"><span style="display: inline-block;">${word}</span></span>`).join(' ');
-            
-            gsap.from(title.querySelectorAll('span span'), {
-                scrollTrigger: {
-                    trigger: title,
-                    start: 'top 85%'
-                },
-                y: isMobile ? 50 : 100,
-                opacity: 0,
-                stagger: 0.05,
-                duration: isMobile ? 0.6 : 0.8,
-                ease: 'power3.out'
-            });
-        });
-
-        // Benefits list cascade
-        gsap.from('.benefits-list li', {
-            scrollTrigger: {
-                trigger: '.benefits-list',
-                start: 'top 85%'
-            },
-            x: isMobile ? -30 : -50,
-            opacity: 0,
-            stagger: 0.12,
-            duration: isMobile ? 0.5 : 0.6,
-            ease: 'power2.out'
-        });
-
-        // Location card entrance
-        gsap.from('.location-card', {
-            scrollTrigger: {
-                trigger: '.location',
-                start: 'top 75%'
-            },
-            scale: isMobile ? 0.95 : 0.9,
-            opacity: 0,
-            y: isMobile ? 30 : 0,
-            duration: isMobile ? 0.8 : 1,
-            ease: 'back.out(1.4)'
-        });
-
-        // Hours item pop
-        gsap.from('.hours-item', {
-            scrollTrigger: {
-                trigger: '.hours-grid',
-                start: 'top 85%'
-            },
-            scale: 0,
-            opacity: 0,
-            stagger: 0.1,
-            duration: 0.6,
-            ease: 'back.out(2)'
-        });
-
-        // Smooth scroll with easing
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
+        // Close menu and smooth scroll on link click (mobile)
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevent default jump
+                menuToggle.classList.remove('active');
+                navLinks.classList.remove('active');
                 
-                // Smooth scroll with custom easing
-                const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - 80;
-                const startPosition = window.pageYOffset;
-                const distance = targetPosition - startPosition;
-                const duration = 1500; // 1.5 seconds
-                let start = null;
+                const target = link.getAttribute('href');
+                gsap.to(window, {duration: 1.5, scrollTo: target, ease: "power3.inOut"});
+            });
+        });
 
-                function animation(currentTime) {
-                    if (start === null) start = currentTime;
-                    const timeElapsed = currentTime - start;
-                    const run = ease(timeElapsed, startPosition, distance, duration);
-                    window.scrollTo(0, run);
-                    if (timeElapsed < duration) requestAnimationFrame(animation);
-                }
 
-                function ease(t, b, c, d) {
-                    t /= d / 2;
-                    if (t < 1) return c / 2 * t * t * t + b;
-                    t -= 2;
-                    return c / 2 * (t * t * t + 2) + b;
-                }
+        // Preloader Animation and Removal
+        const preloader = document.querySelector('.preloader');
+        const preloaderText = document.querySelector('.preloader-text');
+        
+        gsap.timeline()
+            .from(preloaderText, {
+                y: '100%',
+                autoAlpha: 0,
+                duration: 1.5,
+                ease: "expo.out"
+            })
+            .to(preloader, {
+                autoAlpha: 0,
+                duration: 1,
+                delay: 0.5,
+                ease: "power2.inOut",
+                onComplete: () => {
+                    preloader.style.display = 'none';
+                }
+            });
 
-                requestAnimationFrame(animation);
-            });
-        });
+        // Navigation Scroll-in Animation for Desktop
+        if (isDesktop) {
+            gsap.from('nav', {
+                y: -100,
+                autoAlpha: 0,
+                duration: 1,
+                delay: 2, // Wait for preloader to finish
+                ease: "power3.out"
+            });
+        }
+        
+        // --- 🎯 NEW GSAP PINNING LOGIC 🎯 ---
+        // Hero Video Pinning (makes the video stick while other content scrolls up)
+        gsap.to('.hero-content', { 
+            scrollTrigger: {
+                trigger: '.hero',
+                pin: true, 
+                start: 'top top', 
+                end: '+=1000', // Pin lasts for 1000px of scroll
+                scrub: true, 
+                anticipatePin: 1
+            }
+        });
+        // --- 🎯 END OF NEW GSAP PINNING LOGIC 🎯 ---
 
-        // Nav background on scroll (Desktop only)
-        if (isDesktop) {
-            gsap.to('nav', {
-                scrollTrigger: {
-                    start: 100,
-                    toggleActions: 'play none none reverse'
-                },
-                background: 'rgba(26, 15, 10, 0.95)',
-                backdropFilter: 'blur(20px)',
-                padding: '1rem 5%',
-                duration: 0.3
-            });
-        }
 
-        // Parallax scroll on mobile (subtle)
-        if (isMobile) {
-            gsap.utils.toArray('.card, .menu-item').forEach(elem => {
-                gsap.to(elem, {
-                    scrollTrigger: {
-                        trigger: elem,
-                        start: 'top bottom',
-                        end: 'bottom top',
-                        scrub: 1
-                    },
-                    y: -20
-                });
-            });
-        }
-    </script>
+        // Feature Cards ScrollTrigger Animation
+        gsap.from('.card', {
+            y: 100,
+            autoAlpha: 0,
+            stagger: 0.2,
+            ease: "power2.out",
+            scrollTrigger: {
+                trigger: '.features',
+                start: 'top 80%', 
+                toggleActions: 'play none none none'
+            }
+        });
+
+        // Split Section Fade-in Animation
+        gsap.from('.split-content, .split-image', {
+            autoAlpha: 0,
+            x: (i) => i % 2 === 0 ? -100 : 100, 
+            duration: 1.5,
+            stagger: 0.5,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: '.split-section',
+                start: 'top 70%',
+                toggleActions: 'play none none none'
+            }
+        });
+
+        // Custom Cursor Logic (Desktop Only)
+        if (isDesktop) {
+            const cursor = document.querySelector('.cursor');
+            const follower = document.querySelector('.cursor-follower');
+
+            document.addEventListener('mousemove', (e) => {
+                gsap.to(cursor, {
+                    x: e.clientX,
+                    y: e.clientY,
+                    duration: 0.1,
+                    ease: "power2.out"
+                });
+                gsap.to(follower, {
+                    x: e.clientX - 25, 
+                    y: e.clientY - 25, 
+                    duration: 0.5,
+                    ease: "power3.out"
+                });
+            });
+        }
+
+    </script>
 </body>
 </html>
