@@ -997,47 +997,69 @@
         }
     }
 
-    // --- B. Video Scroll-Control (Requires all assets/metadata to be loaded) ---
-    // Use 'window.load' to ensure the video's duration is ready
-    window.addEventListener('load', function() {
-        if (video && smoother) {
+   // --- B. Video Scroll-Control (Requires all assets/metadata to be loaded) ---
+window.addEventListener('load', function() {
+    if (video && smoother) {
+        
+        // Attempt autoplay and immediate pause
+        video.play().catch(error => {
+            console.warn("Autoplay was prevented by the browser (usually due to sound):", error);
+        }).then(() => {
+            // Pause immediately for scroll control
+            video.pause();
+        });
+
+        const setupVideoScrubbing = () => {
+            // Get the video duration. Use a fallback (e.g., 5 seconds) if metadata failed.
+            let duration = video.duration || 5; 
             
-            // Attempt autoplay and immediate pause
-            video.play().catch(error => {
-                console.warn("Autoplay prevented:", error);
-            }).then(() => {
-                video.pause();
+            // Log duration for debugging
+            console.log("Video Duration:", duration);
+
+            // If duration is still 0 or non-numeric (NaN), skip setup
+            if (!duration || duration < 0.1) {
+                console.error("Video failed to load a valid duration. Scrubbing canceled.");
+                return;
+            }
+            
+            // Scroll length = video duration (seconds) * factor (400 pixels/second recommended)
+            const scrollLength = duration * 400; 
+
+            let tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.hero',
+                    pin: true, 
+                    start: 'top top',
+                    // End the scroll space after the calculated length
+                    end: `+=${scrollLength}`, 
+                    scrub: true, 
+                    markers: true, // KEEP THIS ON FOR DEBUGGING!
+                    anticipatePin: 1,
+                    scroller: smoother.content() 
+                }
             });
+            
+            // Animate the video's currentTime property
+            tl.to(video, {
+                currentTime: duration, 
+                duration: duration, 
+                ease: "none"
+            });
+        };
 
-            // Set up video scrubbing only when metadata is loaded
-            video.addEventListener('loadedmetadata', function() {
-                const duration = video.duration;
-                // Scroll length = video duration (seconds) * factor (400 pixels/second recommended)
-                const scrollLength = duration * 400; 
-
-                let tl = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: '.hero',
-                        pin: true, 
-                        start: 'top top',
-                        end: `+=${scrollLength}`, 
-                        scrub: true, 
-                        markers: false, // Set to 'true' for debugging
-                        anticipatePin: 1,
-                        // 🛑 CRITICAL FIX 3: Tells the video trigger to listen to ScrollSmoother's scroll 🛑
-                        scroller: smoother.content() 
-                    }
-                });
-                
-                // Animate the video's currentTime property
-                tl.to(video, {
-                    currentTime: duration, 
-                    duration: duration, 
-                    ease: "none"
-                });
-            }, { once: true });
-        }
-    });
+        // 1. Try to set up scrubbing once metadata is loaded
+        video.addEventListener('loadedmetadata', setupVideoScrubbing, { once: true });
+        
+        // 2. Fallback: If metadata event never fires (due to an error), try setting up after 2 seconds.
+        // This is a last-resort attempt if the video duration is hardcoded.
+        setTimeout(() => {
+            if (!video.duration || video.duration < 0.1) {
+                console.warn("Metadata event didn't fire in time. Attempting setup with fallback duration (5s).");
+                setupVideoScrubbing();
+            }
+        }, 2000); // 2 seconds delay
+    }
+});
 </script>
 </body>
 </html>
