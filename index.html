@@ -1049,138 +1049,147 @@
 
         </div>
     </div>
-    <script>
-        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin, ScrollSmoother); 
+<script>
+    // 1. Register all necessary GSAP plugins
+    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin, ScrollSmoother); 
 
-        // --- A. Set up ScrollSmoother (MANDATORY for smoothing/lag fix) ---
-        let smoother = ScrollSmoother.create({
-            wrapper: '#smooth-wrapper', 
-            content: '#smooth-content', 
-            smooth: window.innerWidth < 768 ? 0 : 1.5, // 0 on mobile, 1.5 on desktop for smoothing
-            effects: true, 
-            normalizeScroll: true
-        });
+    // --- A. Set up ScrollSmoother (MANDATORY for smoothing/lag fix) ---
+    let smoother = ScrollSmoother.create({
+        wrapper: '#smooth-wrapper', 
+        content: '#smooth-content', 
+        smooth: window.innerWidth < 768 ? 0 : 1.5, // 0 on mobile, 1.5 on desktop for smoothing
+        effects: true, 
+        normalizeScroll: true
+    });
 
-        // --- B. Configuration ---
-        const video = document.querySelector('.hero-video');
-        const isMobile = window.innerWidth < 768;
-        
-        // --- C. Video Scroll-Control and Pinning Logic ---
-        window.addEventListener('load', function() {
-            if (video) {
-                // 1. Force play/pause to enable scroll control
-                video.play().catch(() => {});
+    // --- B. Configuration ---
+    const video = document.querySelector('.hero-video');
+    const isMobile = window.innerWidth < 768;
+    
+    // --- C. Video Scroll-Control and Pinning Logic (FIXED) ---
+    window.addEventListener('load', function() {
+        if (video) {
+            
+            // 1. 🛑 FIX: Attempt to play the video right away to satisfy Chrome/Safari policies
+            // Crucially, it must be MUTED (which it is in your HTML)
+            video.play().catch(error => {
+                console.warn("Autoplay was prevented, often fixed by ensuring video is muted:", error);
+            }).then(() => {
+                // Once play is attempted/successful, pause it so scroll can control it
                 video.pause();
+            });
 
-                // 2. Wait for metadata to ensure duration is available
-                video.addEventListener('loadedmetadata', function() {
-                    const duration = video.duration;
-                    // Scroll distance = duration in seconds * 400 pixels (adjust 400 for speed)
-                    const scrollLength = duration * 400; 
+            // 2. Wait for metadata to ensure duration is available
+            video.addEventListener('loadedmetadata', function() {
+                const duration = video.duration;
+                // Scroll distance = duration in seconds * 400 pixels (adjust 400 for speed)
+                const scrollLength = duration * 400; 
 
-                    let tl = gsap.timeline({
-                        scrollTrigger: {
-                            trigger: '.hero',
-                            pin: true, 
-                            start: 'top top',
-                            end: `+=${scrollLength}`, 
-                            scrub: true, 
-                            markers: false,
-                            anticipatePin: 1 
-                        }
-                    });
-                    
-                    tl.to(video, {
-                        currentTime: duration, 
-                        duration: duration, 
-                        ease: "none"
-                    });
-                }, { once: true });
+                let tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: '.hero',
+                        pin: true, 
+                        start: 'top top',
+                        end: `+=${scrollLength}`, 
+                        scrub: true, 
+                        markers: false,
+                        anticipatePin: 1,
+                        scroller: smoother.content() // Must reference ScrollSmoother's content
+                    }
+                });
+                
+                // Animate the video's currentTime property from 0 to its full duration
+                tl.to(video, {
+                    currentTime: duration, 
+                    duration: duration, 
+                    ease: "none"
+                });
+            }, { once: true });
+        }
+    });
+
+    // --- D. Other Page Logic ---
+
+    // Mobile Menu Toggle
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    
+    if (menuToggle && navLinks) {
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+    }
+
+    // Close menu and smooth scroll on link click
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            menuToggle.classList.remove('active');
+            navLinks.classList.remove('active');
+            // Use ScrollSmoother's method to scroll smoothly
+            smoother.scrollTo(link.getAttribute('href'), true, 'center center');
+        });
+    });
+
+    // Preloader Animation and Removal
+    const preloader = document.querySelector('.preloader');
+    const preloaderText = document.querySelector('.preloader-text');
+    
+    if (preloader && preloaderText) {
+        gsap.timeline()
+            .from(preloaderText, {
+                y: '100%', autoAlpha: 0, duration: 1.5, ease: "expo.out"
+            })
+            .to(preloader, {
+                autoAlpha: 0, duration: 1, delay: 0.5, ease: "power2.inOut",
+                onComplete: () => { preloader.style.display = 'none'; }
+            });
+    }
+
+
+    // Content Scroll Animations (Enabled only if not mobile)
+    if (!isMobile) {
+        // Navigation Scroll-in Animation
+        gsap.from('nav', { y: -100, autoAlpha: 0, duration: 1, delay: 2, ease: "power3.out" });
+        
+        // Feature Cards ScrollTrigger Animation
+        gsap.from('.card', {
+            y: 100, autoAlpha: 0, stagger: 0.2, ease: "power2.out",
+            scrollTrigger: { 
+                trigger: '.features', 
+                start: 'top 80%', 
+                toggleActions: 'play none none none',
+                scroller: smoother.content() 
+            }
+        });
+        
+        // Split Section Fade-in Animation
+        gsap.from('.split-content, .split-image', {
+            autoAlpha: 0, x: (i) => i % 2 === 0 ? -100 : 100, duration: 1.5, stagger: 0.5, ease: "power3.out",
+            scrollTrigger: { 
+                trigger: '.split-section', 
+                start: 'top 70%', 
+                toggleActions: 'play none none none',
+                scroller: smoother.content() 
             }
         });
 
-        // --- D. Other Page Logic ---
+        // Custom Cursor Logic 
+        const cursor = document.querySelector('.cursor');
+        const follower = document.querySelector('.cursor-follower');
 
-        // Mobile Menu Toggle
-        const menuToggle = document.querySelector('.menu-toggle');
-        const navLinks = document.querySelector('.nav-links');
-        
-        if (menuToggle && navLinks) {
-            menuToggle.addEventListener('click', () => {
-                menuToggle.classList.toggle('active');
-                navLinks.classList.toggle('active');
-            });
-        }
-
-        // Close menu and smooth scroll on link click
-        document.querySelectorAll('.nav-links a').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                menuToggle.classList.remove('active');
-                navLinks.classList.remove('active');
-                // Use ScrollSmoother's method to scroll smoothly
-                smoother.scrollTo(link.getAttribute('href'), true, 'center center');
-            });
-        });
-
-        // Preloader Animation and Removal
-        const preloader = document.querySelector('.preloader');
-        const preloaderText = document.querySelector('.preloader-text');
-        
-        if (preloader && preloaderText) {
-            gsap.timeline()
-                .from(preloaderText, {
-                    y: '100%', autoAlpha: 0, duration: 1.5, ease: "expo.out"
-                })
-                .to(preloader, {
-                    autoAlpha: 0, duration: 1, delay: 0.5, ease: "power2.inOut",
-                    onComplete: () => { preloader.style.display = 'none'; }
+        if (cursor && follower) {
+            document.addEventListener('mousemove', (e) => {
+                gsap.to(cursor, {
+                    x: e.clientX, y: e.clientY, duration: 0.1, ease: "power2.out"
                 });
-        }
-
-
-        // Content Scroll Animations (Enabled only if not mobile)
-        if (!isMobile) {
-            // Navigation Scroll-in Animation
-            gsap.from('nav', { y: -100, autoAlpha: 0, duration: 1, delay: 2, ease: "power3.out" });
-            
-            // Feature Cards ScrollTrigger Animation
-            gsap.from('.card', {
-                y: 100, autoAlpha: 0, stagger: 0.2, ease: "power2.out",
-                scrollTrigger: { 
-                    trigger: '.features', 
-                    start: 'top 80%', 
-                    toggleActions: 'play none none none',
-                    scroller: smoother.content() // Link ScrollTrigger to ScrollSmoother's scroll element
-                }
-            });
-            
-            // Split Section Fade-in Animation
-            gsap.from('.split-content, .split-image', {
-                autoAlpha: 0, x: (i) => i % 2 === 0 ? -100 : 100, duration: 1.5, stagger: 0.5, ease: "power3.out",
-                scrollTrigger: { 
-                    trigger: '.split-section', 
-                    start: 'top 70%', 
-                    toggleActions: 'play none none none',
-                    scroller: smoother.content() // Link ScrollTrigger to ScrollSmoother's scroll element
-                }
-            });
-
-            // Custom Cursor Logic 
-            const cursor = document.querySelector('.cursor');
-            const follower = document.querySelector('.cursor-follower');
-
-            if (cursor && follower) {
-                document.addEventListener('mousemove', (e) => {
-                    gsap.to(cursor, {
-                        x: e.clientX, y: e.clientY, duration: 0.1, ease: "power2.out"
-                    });
-                    gsap.to(follower, {
-                        x: e.clientX - 25, y: e.clientY - 25, duration: 0.5, ease: "power3.out"
-                    });
+                gsap.to(follower, {
+                    x: e.clientX - 25, y: e.clientY - 25, duration: 0.5, ease: "power3.out"
                 });
-            }
+            });
         }
-    </script>
+    }
+</script>
 </body>
 </html>
