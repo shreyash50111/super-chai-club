@@ -868,7 +868,6 @@
     </div>
 <script>
     // 1. --- GSAP Plugin Registration ---
-    // Ensure all required plugins are registered
     gsap.registerPlugin(ScrollTrigger, ScrollToPlugin, ScrollSmoother); 
 
     let smoother;
@@ -879,7 +878,7 @@
 
     // --- A. Core Setup (Initialize ScrollSmoother and Run Initial Animations) ---
     
-    // Initialize Smoother right away
+    // Initialize Smoother
     smoother = ScrollSmoother.create({
         wrapper: '#smooth-wrapper', 
         content: '#smooth-content', 
@@ -907,7 +906,6 @@
             ease: "power2.inOut",
             onComplete: () => { 
                 preloader.style.display = 'none';
-                // Refresh Smoother after content size changes
                 if (smoother) smoother.refresh(); 
             }
         });
@@ -930,7 +928,6 @@
             menuToggle.classList.remove('active');
             navLinks.classList.remove('active');
             if (smoother) {
-                // Use ScrollSmoother's method for smooth navigation
                 smoother.scrollTo(link.getAttribute('href'), true, 'center top');
             } else {
                 document.querySelector(link.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
@@ -940,10 +937,8 @@
 
     // 4. Content Scroll Animations (Enabled only if not mobile)
     if (!isMobile) {
-        // Navigation Scroll-in
         gsap.from('nav', { y: -100, autoAlpha: 0, duration: 1, delay: 1.5, ease: "power3.out" });
         
-        // Feature Cards (FIXED: Added scroller: smoother.content())
         gsap.utils.toArray('.card').forEach(card => {
             gsap.from(card, {
                 y: 100, 
@@ -954,13 +949,11 @@
                     trigger: card, 
                     start: 'top 90%', 
                     toggleActions: 'play none none none',
-                    // 🛑 CRITICAL FIX 1 🛑
                     scroller: smoother.content() 
                 }
             });
         });
         
-        // Split Section (FIXED: Added scroller: smoother.content())
         gsap.from('.split-content, .split-image', {
             autoAlpha: 0, 
             x: (i) => i % 2 === 0 ? -100 : 100, 
@@ -971,12 +964,11 @@
                 trigger: '.split-section', 
                 start: 'top 70%', 
                 toggleActions: 'play none none none',
-                // 🛑 CRITICAL FIX 2 🛑
                 scroller: smoother.content() 
             }
         });
 
-        // Custom Cursor Logic (Kept as is)
+        // 🟢 HOVER ANIMATIONS RESTORED 🟢
         const cursor = document.querySelector('.cursor');
         const follower = document.querySelector('.cursor-follower');
 
@@ -997,67 +989,62 @@
         }
     }
 
-// --- B. Video Scroll-Control (Ensures Smoother is ready and Video Duration is valid) ---
-window.addEventListener('load', function() {
-    if (video && smoother) {
-        
-        // 1. Attempt Autoplay and Pause
-        video.play().catch(error => {
-            console.warn("Autoplay was prevented by the browser (usually due to sound):", error);
-        }).then(() => {
-            video.pause();
-        });
-
-        const setupVideoScrubbing = () => {
-            // Get the video duration, defaulting to 5 seconds if metadata fails.
-            let duration = video.duration || 5; 
+    // --- B. Video Scroll-Control (The Scruber) ---
+    window.addEventListener('load', function() {
+        if (video && smoother) {
             
-            // Log duration for debugging. CHECK THIS IN YOUR CONSOLE (F12)!
-            console.log("Video Duration for Scrubbing:", duration, "seconds.");
+            // 1. Attempt Autoplay and Pause
+            video.play().catch(error => {
+                console.warn("Autoplay was prevented by the browser:", error);
+            }).then(() => {
+                video.pause();
+            });
 
-            // CRITICAL CHECK: If duration is invalid or zero, do not create the ScrollTrigger.
-            if (!duration || duration < 0.1) {
-                console.error("Video duration is invalid. Check 'tea.mp4' file path and codec.");
-                return;
-            }
-            
-            // Calculate scroll space needed (400 pixels of scroll for every 1 second of video)
-            const scrollLength = duration * 400; 
+            const setupVideoScrubbing = () => {
+                let duration = video.duration || 5; 
+                
+                console.log("Video Duration for Scrubbing:", duration, "seconds.");
 
-            // 2. Create the ScrollTrigger Timeline
-            let tl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: '.hero',
-                    pin: true, 
-                    start: 'top top',
-                    end: `+=${scrollLength}`, 
-                    scrub: true, 
-                    markers: true, // KEEP THIS ON. If you see markers, the code is running!
-                    anticipatePin: 1,
-                    scroller: smoother.content() 
+                if (!duration || duration < 0.1) {
+                    console.error("Video duration is invalid. Scrubbing canceled.");
+                    return;
                 }
-            });
-            
-            // 3. Animate the video's currentTime property
-            tl.to(video, {
-                currentTime: duration, 
-                duration: duration, 
-                ease: "none"
-            });
-        };
+                
+                const scrollLength = duration * 400; 
 
-        // Attempt setup once metadata is loaded
-        video.addEventListener('loadedmetadata', setupVideoScrubbing, { once: true });
-        
-        // Fallback: If metadata event doesn't fire, try to set up after a short delay 
-        // in case the duration is being hard-coded or loaded late.
-        setTimeout(() => {
-            if (!video.duration || video.duration < 0.1) {
-                setupVideoScrubbing();
-            }
-        }, 1000); // 1 second delay
-    }
-});
+                // 2. Create the ScrollTrigger Timeline
+                let tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: '.hero',
+                        pin: true, 
+                        start: 'top top',
+                        end: `+=${scrollLength}`, 
+                        scrub: true, 
+                        markers: true, // KEEP THIS ON FOR DEBUGGING!
+                        anticipatePin: 1,
+                        scroller: smoother.content() 
+                    }
+                });
+                
+                // 3. Animate the video's currentTime property
+                tl.to(video, {
+                    currentTime: duration, 
+                    duration: duration, 
+                    ease: "none"
+                });
+            };
+
+            // Attempt setup once metadata is loaded
+            video.addEventListener('loadedmetadata', setupVideoScrubbing, { once: true });
+            
+            // Fallback setup after 1 second
+            setTimeout(() => {
+                if (!video.duration || video.duration < 0.1) {
+                    setupVideoScrubbing();
+                }
+            }, 1000); 
+        }
+    });
 </script>
 </body>
 </html>
