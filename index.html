@@ -927,7 +927,7 @@
         });
     }
     
-    // 3. Navigation and Menu Logic
+    // 3. Navigation and Menu Logic (Same as before)
     const menuToggle = document.querySelector('.menu-toggle');
     const navLinks = document.querySelector('.nav-links');
     
@@ -951,7 +951,7 @@
         });
     });
 
-    // 4. Content Scroll Animations (Enabled only if not mobile)
+    // 4. Content Scroll Animations & Hover (Same as before)
     if (!isMobile) {
         gsap.from('nav', { y: -100, autoAlpha: 0, duration: 1, delay: 1.5, ease: "power3.out" });
         
@@ -984,7 +984,7 @@
             }
         });
 
-        // 🟢 HOVER ANIMATIONS RESTORED 🟢
+        // HOVER ANIMATIONS RESTORED
         const cursor = document.querySelector('.cursor');
         const follower = document.querySelector('.cursor-follower');
 
@@ -1005,11 +1005,11 @@
         }
     }
 
-    // --- B. Video Scroll-Control (The Scruber) ---
+    // --- B. Video Scroll-Control (Final 4-Second Scrub) ---
     window.addEventListener('load', function() {
         if (video && smoother) {
             
-            // 1. Attempt Autoplay and Pause (Muted and playsinline are required in HTML)
+            // 1. Attempt Autoplay and Pause
             video.play().catch(error => {
                 console.warn("Autoplay was prevented by the browser:", error);
             }).then(() => {
@@ -1017,52 +1017,33 @@
                 video.pause();
             });
 
-            const setupVideoScrubbing = () => {
-                // Default fallback duration is 5 seconds
-                let duration = video.duration || 5; 
-                
-                console.log("Video Duration for Scrubbing:", duration, "seconds.");
+            // 🛑 CRITICAL FIX: HARD-CODED DURATION 🛑
+            const duration = 4; // Confirmed 4-second video length
+            console.log("Video Duration Set (Hard-Coded):", duration, "seconds.");
 
-                if (!duration || duration < 0.1) {
-                    console.error("Video duration is invalid. Scrubbing canceled. Check 'tea.mp4' file path and codec.");
-                    return;
+            // Calculate scroll space needed (400 pixels of scroll per second)
+            const scrollLength = duration * 400; // 1600 pixels of scrolling
+
+            // 2. Create the ScrollTrigger Timeline IMMEDIATELY
+            let tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.hero',
+                    pin: true, 
+                    start: 'top top',
+                    end: `+=${scrollLength}`, // 1600 pixels total
+                    scrub: true, 
+                    markers: true, // KEEP THIS ON!
+                    anticipatePin: 1,
+                    scroller: smoother.content() // Links to ScrollSmoother
                 }
-                
-                // Calculate scroll space needed
-                const scrollLength = duration * 400; 
-
-                // 2. Create the ScrollTrigger Timeline
-                let tl = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: '.hero',
-                        pin: true, 
-                        start: 'top top',
-                        end: `+=${scrollLength}`, 
-                        scrub: true, 
-                        markers: true, // KEEP THIS ON FOR DEBUGGING!
-                        anticipatePin: 1,
-                        scroller: smoother.content() // CRITICAL: Links to ScrollSmoother
-                    }
-                });
-                
-                // 3. Animate the video's currentTime property
-                tl.to(video, {
-                    currentTime: duration, 
-                    duration: duration, 
-                    ease: "none"
-                });
-            };
-
-            // Attempt setup once metadata is loaded
-            video.addEventListener('loadedmetadata', setupVideoScrubbing, { once: true });
+            });
             
-            // Fallback setup after 1 second (if metadata event fails to fire)
-            setTimeout(() => {
-                // If duration is still invalid, run setup anyway with fallback
-                if (!video.duration || video.duration < 0.1) {
-                    setupVideoScrubbing();
-                }
-            }, 1000); 
+            // 3. Animate the video's currentTime property from 0 to 4
+            tl.to(video, {
+                currentTime: duration, // Animate to 4.0 seconds
+                duration: duration, 
+                ease: "none"
+            });
         }
     });
 </script>
