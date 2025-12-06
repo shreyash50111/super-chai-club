@@ -1045,149 +1045,157 @@
     </footer>
 
 <script>
-        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-        // --- Configuration Variables ---
-        const video = document.querySelector('.hero-video');
-        const isMobile = window.innerWidth < 768;
-        
-        // Force video play on load (needed for many browsers to allow .play() later)
-        if (video) {
-            video.play().catch(() => {});
-            video.pause(); // Immediately pause it so scroll can take over
-        }
+    // --- Configuration Variables ---
+    const video = document.querySelector('.hero-video');
+    const isMobile = window.innerWidth < 768;
+    
+    // --- Video Ready Listener (Crucial for reliable scroll-control) ---
+    // Wait for the window to load AND the video metadata to load
+    window.addEventListener('load', function() {
+        if (video) {
+            // 1. Force play/pause to enable scroll control
+            video.play().catch(() => {});
+            video.pause();
 
-        // --- 1. Video Scroll-Control and Pinning ---
-        if (video) {
-            // Ensure the video length is available before setting up ScrollTrigger
-            video.addEventListener('loadedmetadata', () => {
-                const duration = video.duration;
+            // 2. Wait for metadata to ensure duration is available
+            video.addEventListener('loadedmetadata', function() {
+                const duration = video.duration;
+                // Calculate scroll length: (video duration in seconds) * (pixels per second)
+                const scrollLength = duration * 300; // 300 is a good starting value for speed
 
-                // Calculate the scroll length based on video duration (e.g., 5000px)
-                // We use a longer scroll duration to make the effect noticeable
-                const scrollLength = duration * 300; // Adjust '300' for slower/faster scroll speed
+                // --- Video Scroll-Control and Pinning ---
+                let tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: '.hero',
+                        pin: true, 
+                        start: 'top top',
+                        end: `+=${scrollLength}`, // Pin lasts exactly as long as required for playback
+                        scrub: true, 
+                        markers: false, // Set to true to see ScrollTrigger boundaries for debugging
+                        // Added to handle potential scroll jumping/lag
+                        anticipatePin: 1 
+                    }
+                });
+                
+                // Animate the video's currentTime from 0 to its full duration
+                tl.to(video, {
+                    currentTime: duration, 
+                    duration: duration, // Use video duration for the timeline duration
+                    ease: "none"
+                });
+            }, { once: true });
+        }
+    });
 
-                // Create the animation timeline to control the video playback
-                let tl = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: '.hero',
-                        pin: true, // PIN the entire section
-                        start: 'top top',
-                        end: `+=${scrollLength}`, // Pin ends after the video-controlled scroll distance
-                        scrub: true, // Link playback to scroll position
-                        markers: false // Set to true for debugging
-                    }
-                });
-                
-                // Animate a dummy object to control the video's currentTime
-                tl.to(video, {
-                    currentTime: duration, // Animate currentTime from 0 to video duration
-                    duration: duration, 
-                    ease: "none"
-                });
-            });
-        }
+    // --- Other Logic (Kept outside the video listener) ---
 
-        // --- 2. Mobile Menu and Smooth Scroll ---
-        const menuToggle = document.querySelector('.menu-toggle');
-        const navLinks = document.querySelector('.nav-links');
-        
-        menuToggle.addEventListener('click', () => {
-            menuToggle.classList.toggle('active');
-            navLinks.classList.toggle('active');
-        });
+    // Mobile Menu and Smooth Scroll
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    
+    if (menuToggle && navLinks) {
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+    }
 
-        document.querySelectorAll('.nav-links a').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                menuToggle.classList.remove('active');
-                navLinks.classList.remove('active');
-                const target = link.getAttribute('href');
-                gsap.to(window, {duration: 1.5, scrollTo: target, ease: "power3.inOut"});
-            });
-        });
-
-
-        // --- 3. Preloader Animation and Removal ---
-        const preloader = document.querySelector('.preloader');
-        const preloaderText = document.querySelector('.preloader-text');
-        
-        gsap.timeline()
-            .from(preloaderText, {
-                y: '100%',
-                autoAlpha: 0,
-                duration: 1.5,
-                ease: "expo.out"
-            })
-            .to(preloader, {
-                autoAlpha: 0,
-                duration: 1,
-                delay: 0.5,
-                ease: "power2.inOut",
-                onComplete: () => {
-                    preloader.style.display = 'none';
-                }
-            });
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            menuToggle.classList.remove('active');
+            navLinks.classList.remove('active');
+            const target = link.getAttribute('href');
+            gsap.to(window, {duration: 1.5, scrollTo: target, ease: "power3.inOut"});
+        });
+    });
 
 
-        // --- 4. Content Scroll Animations (Enabled only if not mobile) ---
-        if (!isMobile) {
-            // Navigation Scroll-in Animation
-            gsap.from('nav', {
-                y: -100,
-                autoAlpha: 0,
-                duration: 1,
-                delay: 2, 
-                ease: "power3.out"
-            });
-            
-            // Feature Cards ScrollTrigger Animation
-            gsap.from('.card', {
-                y: 100,
+    // Preloader Animation and Removal
+    const preloader = document.querySelector('.preloader');
+    const preloaderText = document.querySelector('.preloader-text');
+    
+    if (preloader && preloaderText) {
+        gsap.timeline()
+            .from(preloaderText, {
+                y: '100%',
                 autoAlpha: 0,
-                stagger: 0.2,
-                ease: "power2.out",
-                scrollTrigger: {
-                    trigger: '.features',
-                    start: 'top 80%', 
-                    toggleActions: 'play none none none'
-                }
-            });
-
-            // Split Section Fade-in Animation
-            gsap.from('.split-content, .split-image', {
-                autoAlpha: 0,
-                x: (i) => i % 2 === 0 ? -100 : 100, 
                 duration: 1.5,
-                stagger: 0.5,
-                ease: "power3.out",
-                scrollTrigger: {
-                    trigger: '.split-section',
-                    start: 'top 70%',
-                    toggleActions: 'play none none none'
+                ease: "expo.out"
+            })
+            .to(preloader, {
+                autoAlpha: 0,
+                duration: 1,
+                delay: 0.5,
+                ease: "power2.inOut",
+                onComplete: () => {
+                    preloader.style.display = 'none';
                 }
             });
+    }
 
-            // Custom Cursor Logic (Desktop Only)
-            const cursor = document.querySelector('.cursor');
-            const follower = document.querySelector('.cursor-follower');
 
-            document.addEventListener('mousemove', (e) => {
-                gsap.to(cursor, {
-                    x: e.clientX,
-                    y: e.clientY,
-                    duration: 0.1,
-                    ease: "power2.out"
-                });
-                gsap.to(follower, {
-                    x: e.clientX - 25, 
-                    y: e.clientY - 25, 
-                    duration: 0.5,
-                    ease: "power3.out"
-                });
-            });
-        }
+    // Content Scroll Animations (Enabled only if not mobile)
+    if (!isMobile) {
+        // Navigation Scroll-in Animation
+        gsap.from('nav', {
+            y: -100,
+            autoAlpha: 0,
+            duration: 1,
+            delay: 2, 
+            ease: "power3.out"
+        });
+        
+        // Feature Cards ScrollTrigger Animation
+        gsap.from('.card', {
+            y: 100,
+            autoAlpha: 0,
+            stagger: 0.2,
+            ease: "power2.out",
+            scrollTrigger: {
+                trigger: '.features',
+                start: 'top 80%', 
+                toggleActions: 'play none none none'
+            }
+        });
 
-    </script>
+        // Split Section Fade-in Animation
+        gsap.from('.split-content, .split-image', {
+            autoAlpha: 0,
+            x: (i) => i % 2 === 0 ? -100 : 100, 
+            duration: 1.5,
+            stagger: 0.5,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: '.split-section',
+                start: 'top 70%',
+                toggleActions: 'play none none none'
+            }
+        });
+
+        // Custom Cursor Logic 
+        const cursor = document.querySelector('.cursor');
+        const follower = document.querySelector('.cursor-follower');
+
+        if (cursor && follower) {
+            document.addEventListener('mousemove', (e) => {
+                gsap.to(cursor, {
+                    x: e.clientX,
+                    y: e.clientY,
+                    duration: 0.1,
+                    ease: "power2.out"
+                });
+                gsap.to(follower, {
+                    x: e.clientX - 25, 
+                    y: e.clientY - 25, 
+                    duration: 0.5,
+                    ease: "power3.out"
+                });
+            });
+        }
+    }
+</script>
 </body>
 </html>
