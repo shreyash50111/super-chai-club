@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Chai Club - Jaggery Chai Excellence</title>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollSmoother.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+
+<script src="https://unpkg.com/gsap@3.13.0/dist/ScrollSmoother.min.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Poppins:wght@300;400;600;700&display=swap');
@@ -864,8 +865,9 @@
 
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
-   <script>
+<script>
+    // 1. --- GSAP Plugin Registration ---
+    // Register all necessary plugins now that ScrollSmoother is (hopefully) loaded via unpkg
     gsap.registerPlugin(ScrollTrigger, ScrollToPlugin, ScrollSmoother); 
 
     let smoother;
@@ -874,24 +876,23 @@
     const preloaderText = document.querySelector('.preloader-text');
     const video = document.querySelector('.hero-video');
 
-    // --- A. Core Setup (Run when HTML is parsed) ---
+    // --- A. Core Setup (Run when HTML structure is parsed) ---
     document.addEventListener('DOMContentLoaded', function() {
         
         // 1. Initialize ScrollSmoother first
         smoother = ScrollSmoother.create({
             wrapper: '#smooth-wrapper', 
             content: '#smooth-content', 
-            smooth: isMobile ? 0 : 1.5,
+            smooth: isMobile ? 0 : 1.5, // Disable on mobile for performance
             effects: true, 
             normalizeScroll: true,
             ignoreMobileResize: true,
         });
 
-        // 2. Preloader Animation
+        // 2. Preloader Animation and Removal
         if (preloader && preloaderText) {
             gsap.timeline({
-                // Delay reduced to speed up testing
-                delay: 0.2 
+                delay: 0.2 // Small initial delay
             })
             // Text entrance
             .from(preloaderText, {
@@ -908,18 +909,45 @@
                 ease: "power2.inOut",
                 onComplete: () => { 
                     preloader.style.display = 'none';
-                    // Re-enable ScrollSmoother's ability to recalculate layout
+                    // Refresh ScrollSmoother layout after preloader removal
                     if (smoother) smoother.refresh(); 
                 }
             });
         }
         
-        // 3. Other Non-Video Animations (Start when preloader is done or immediately if no preloader)
+        // 3. Navigation and Menu Logic
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        
+        if (menuToggle && navLinks) {
+            menuToggle.addEventListener('click', () => {
+                menuToggle.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+        }
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                menuToggle.classList.remove('active');
+                navLinks.classList.remove('active');
+                if (smoother) {
+                    // Use ScrollSmoother's method to scroll smoothly to the target
+                    smoother.scrollTo(link.getAttribute('href'), true, 'center top');
+                } else {
+                    // Fallback scroll if smoother fails
+                    document.querySelector(link.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // 4. Content Scroll Animations (Enabled only if not mobile)
         if (!isMobile) {
-            // Navigation Scroll-in Animation
-            gsap.from('nav', { y: -100, autoAlpha: 0, duration: 1, delay: 1.5, ease: "power3.out" }); // Adjusted delay
+            // Navigation Scroll-in Animation (Delayed to start after preloader)
+            gsap.from('nav', { y: -100, autoAlpha: 0, duration: 1, delay: 1.5, ease: "power3.out" });
             
-            // Feature Cards ScrollTrigger Animation (using the existing, working loop)
+            // Feature Cards ScrollTrigger Animation
             gsap.utils.toArray('.card').forEach(card => {
                 gsap.from(card, {
                     y: 100, 
@@ -950,7 +978,7 @@
                 }
             });
 
-            // Custom Cursor Logic (as defined before)
+            // Custom Cursor Logic 
             const cursor = document.querySelector('.cursor');
             const follower = document.querySelector('.cursor-follower');
 
@@ -959,6 +987,7 @@
                     gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1, ease: "power2.out" });
                     gsap.to(follower, { x: e.clientX - 25, y: e.clientY - 25, duration: 0.5, ease: "power3.out" });
                 });
+                
                 document.querySelectorAll('a, .card, .menu-item, .gallery-item').forEach(el => {
                     el.addEventListener('mouseenter', () => {
                         gsap.to(follower, { scale: 1.5, background: 'var(--accent)', duration: 0.3 });
@@ -976,7 +1005,7 @@
     window.addEventListener('load', function() {
         if (video && smoother) {
             
-            // 1. Attempt to play the video to bypass policies
+            // 1. Attempt to play the video to bypass browser policies (must be muted in HTML)
             video.play().catch(error => {
                 console.warn("Autoplay prevented:", error);
             }).then(() => {
@@ -984,9 +1013,10 @@
                 video.pause();
             });
 
-            // 2. Wait for metadata to ensure duration is available
+            // 2. Wait for metadata to ensure video duration is available
             video.addEventListener('loadedmetadata', function() {
                 const duration = video.duration;
+                // Scroll length = video duration (seconds) * factor (pixels/second)
                 const scrollLength = duration * 400; 
 
                 let tl = gsap.timeline({
@@ -998,11 +1028,12 @@
                         scrub: true, 
                         markers: false,
                         anticipatePin: 1,
+                        // Must reference the content element of ScrollSmoother
                         scroller: smoother.content() 
                     }
                 });
                 
-                // Animate the video's currentTime property
+                // Animate the video's currentTime property from 0 to its full duration
                 tl.to(video, {
                     currentTime: duration, 
                     duration: duration, 
@@ -1010,32 +1041,6 @@
                 });
             }, { once: true });
         }
-    });
-    
-    // --- C. Menu and Scrolling (Can run after DOMContentLoad, uses smoother) ---
-    const menuToggle = document.querySelector('.menu-toggle');
-    const navLinks = document.querySelector('.nav-links');
-    
-    if (menuToggle && navLinks) {
-        menuToggle.addEventListener('click', () => {
-            menuToggle.classList.toggle('active');
-            navLinks.classList.toggle('active');
-        });
-    }
-
-    document.querySelectorAll('.nav-links a').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            menuToggle.classList.remove('active');
-            navLinks.classList.remove('active');
-            // Use ScrollSmoother's method
-            if (smoother) {
-                smoother.scrollTo(link.getAttribute('href'), true, 'center top');
-            } else {
-                // Fallback if smoother hasn't initialized yet
-                document.querySelector(link.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
-            }
-        });
     });
 </script>
 </body>
