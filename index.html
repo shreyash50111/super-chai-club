@@ -21,7 +21,23 @@
             padding: 0;
             box-sizing: border-box;
         }
+        /* Add this rule to the CSS <style> block */
+.hero-video {
+    /* ... existing rules ... */
+    transform: translate(-50%, -50%);
+    filter: brightness(0.85);
+    object-fit: cover;
+    /* 🛑 CRITICAL FIX FOR PINNING/SCRUBBING 🛑 */
+    **will-change: transform, opacity;** /* Hints browser for complex changes */
+    **z-index: 0;** /* Ensure it's rendered below content */
+}
 
+/* Also ensure the .hero content is above the video */
+.hero-content {
+    position: relative;
+    z-index: 2; /* Needs to be higher than video's z-index */
+    /* ... existing rules ... */
+}
         :root {
             --primary: #D4A574; /* Gold/Bronze */
             --dark: #5c4a3a; /* Deep Brown/Chocolate */
@@ -993,23 +1009,26 @@
     window.addEventListener('load', function() {
         if (video && smoother) {
             
-            // 1. Attempt Autoplay and Pause
+            // 1. Attempt Autoplay and Pause (Muted and playsinline are required in HTML)
             video.play().catch(error => {
                 console.warn("Autoplay was prevented by the browser:", error);
             }).then(() => {
+                // Ensure it's paused immediately for scroll control
                 video.pause();
             });
 
             const setupVideoScrubbing = () => {
+                // Default fallback duration is 5 seconds
                 let duration = video.duration || 5; 
                 
                 console.log("Video Duration for Scrubbing:", duration, "seconds.");
 
                 if (!duration || duration < 0.1) {
-                    console.error("Video duration is invalid. Scrubbing canceled.");
+                    console.error("Video duration is invalid. Scrubbing canceled. Check 'tea.mp4' file path and codec.");
                     return;
                 }
                 
+                // Calculate scroll space needed
                 const scrollLength = duration * 400; 
 
                 // 2. Create the ScrollTrigger Timeline
@@ -1022,7 +1041,7 @@
                         scrub: true, 
                         markers: true, // KEEP THIS ON FOR DEBUGGING!
                         anticipatePin: 1,
-                        scroller: smoother.content() 
+                        scroller: smoother.content() // CRITICAL: Links to ScrollSmoother
                     }
                 });
                 
@@ -1037,8 +1056,9 @@
             // Attempt setup once metadata is loaded
             video.addEventListener('loadedmetadata', setupVideoScrubbing, { once: true });
             
-            // Fallback setup after 1 second
+            // Fallback setup after 1 second (if metadata event fails to fire)
             setTimeout(() => {
+                // If duration is still invalid, run setup anyway with fallback
                 if (!video.duration || video.duration < 0.1) {
                     setupVideoScrubbing();
                 }
