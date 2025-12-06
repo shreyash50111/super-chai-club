@@ -18,11 +18,12 @@
 
         :root {
             --primary: #D4A574;
-            --dark: #3d2817;
+            --dark: #5c4a3a;
             --accent: #FF6B35;
             --light: #FFF5E6;
             --gold: #FFD700;
-            --bg-light: #4a3425;
+            --bg-light: #8B7355;
+            --bg-lighter: #a89178;
         }
 
         body {
@@ -198,7 +199,7 @@
             width: auto;
             height: auto;
             transform: translate(-50%, -50%);
-            filter: brightness(0.7);
+            filter: brightness(0.85);
             object-fit: cover;
         }
 
@@ -209,7 +210,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(to bottom, rgba(61, 40, 23, 0.2), rgba(61, 40, 23, 0.4));
+            background: linear-gradient(to bottom, rgba(92, 74, 58, 0.1), rgba(92, 74, 58, 0.3));
             z-index: 1;
         }
 
@@ -336,7 +337,7 @@
         /* Feature Cards */
         .features {
             padding: clamp(4rem, 10vw, 10rem) 5%;
-            background: var(--bg-light);
+            background: var(--bg-lighter);
             position: relative;
         }
 
@@ -358,18 +359,19 @@
         }
 
         .card {
-            background: linear-gradient(135deg, rgba(212, 165, 116, 0.15), rgba(255, 107, 53, 0.15));
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
             border-radius: 25px;
             padding: clamp(2rem, 4vw, 3rem);
             position: relative;
             overflow: hidden;
             cursor: pointer;
-            border: 2px solid transparent;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             transition: all 0.4s ease;
             min-height: 300px;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            backdrop-filter: blur(10px);
         }
 
         .card::before {
@@ -482,7 +484,7 @@
         /* Menu Section */
         .menu {
             padding: clamp(4rem, 10vw, 10rem) 5%;
-            background: var(--bg-light);
+            background: var(--bg-lighter);
             position: relative;
         }
 
@@ -495,14 +497,15 @@
         }
 
         .menu-item {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(212, 165, 116, 0.3);
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
             border-radius: 20px;
             padding: clamp(2rem, 4vw, 3rem);
             text-align: center;
             position: relative;
             transition: all 0.5s ease;
             overflow: hidden;
+            backdrop-filter: blur(10px);
         }
 
         .menu-item::before {
@@ -524,8 +527,8 @@
         }
 
         .menu-item:hover {
-            background: rgba(212, 165, 116, 0.1);
-            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.35);
+            border-color: var(--gold);
             transform: translateY(-10px) scale(1.05);
         }
 
@@ -617,7 +620,7 @@
         /* Location */
         .location {
             padding: clamp(4rem, 10vw, 10rem) 5%;
-            background: var(--bg-light);
+            background: var(--bg-lighter);
             text-align: center;
         }
 
@@ -639,11 +642,12 @@
         .location-card {
             max-width: 1000px;
             margin: clamp(3rem, 5vw, 5rem) auto 0;
-            background: linear-gradient(135deg, rgba(212, 165, 116, 0.15), rgba(255, 107, 53, 0.15));
+            background: rgba(255, 255, 255, 0.2);
             border-radius: 30px;
             padding: clamp(3rem, 5vw, 5rem);
-            border: 2px solid var(--primary);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
         }
 
         .location-title {
@@ -669,24 +673,26 @@
         }
 
         .hours-item {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.25);
             padding: clamp(2rem, 2vw, 2.5rem);
             border-radius: 20px;
-            border: 2px solid rgba(212, 165, 116, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.4);
             transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
 
         .hours-item:hover {
             transform: scale(1.05);
-            border-color: var(--accent);
+            border-color: var(--gold);
+            background: rgba(255, 255, 255, 0.35);
         }
 
         /* Footer */
         footer {
             padding: clamp(3rem, 5vw, 5rem) 5%;
-            background: #0a0604;
+            background: var(--dark);
             text-align: center;
-            border-top: 2px solid var(--primary);
+            border-top: 2px solid var(--gold);
         }
 
         .footer-text {
@@ -847,9 +853,8 @@
     </nav>
 
     <section id="home" class="hero">
-        <video class="hero-video" autoplay muted loop playsinline preload="auto">
+        <video class="hero-video" autoplay muted loop playsinline preload="metadata">
             <source src="tea.mp4" type="video/mp4">
-            Your browser does not support the video tag.
         </video>
         <div class="float-element float-1"></div>
         <div class="float-element float-2"></div>
@@ -1010,6 +1015,16 @@
 
     <script>
         gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+        // Force video play on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const video = document.querySelector('.hero-video');
+            if (video) {
+                video.play().catch(err => {
+                    console.log('Video autoplay failed:', err);
+                });
+            }
+        });
 
         // Check if mobile/tablet
         const isMobile = window.innerWidth < 768;
