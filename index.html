@@ -868,7 +868,7 @@
     </div>
 <script>
     // 1. --- GSAP Plugin Registration ---
-    // Register all necessary plugins
+    // Ensure all required plugins are registered
     gsap.registerPlugin(ScrollTrigger, ScrollToPlugin, ScrollSmoother); 
 
     let smoother;
@@ -877,10 +877,9 @@
     const preloaderText = document.querySelector('.preloader-text');
     const video = document.querySelector('.hero-video');
 
-    // --- A. Core Setup (Run when HTML structure is parsed) ---
-    // The script is placed before </body>, so DOMContentLoaded is technically redundant but good practice.
+    // --- A. Core Setup (Initialize ScrollSmoother and Run Initial Animations) ---
     
-    // 1. Initialize ScrollSmoother first
+    // Initialize Smoother right away
     smoother = ScrollSmoother.create({
         wrapper: '#smooth-wrapper', 
         content: '#smooth-content', 
@@ -908,6 +907,7 @@
             ease: "power2.inOut",
             onComplete: () => { 
                 preloader.style.display = 'none';
+                // Refresh Smoother after content size changes
                 if (smoother) smoother.refresh(); 
             }
         });
@@ -930,6 +930,7 @@
             menuToggle.classList.remove('active');
             navLinks.classList.remove('active');
             if (smoother) {
+                // Use ScrollSmoother's method for smooth navigation
                 smoother.scrollTo(link.getAttribute('href'), true, 'center top');
             } else {
                 document.querySelector(link.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
@@ -939,8 +940,10 @@
 
     // 4. Content Scroll Animations (Enabled only if not mobile)
     if (!isMobile) {
+        // Navigation Scroll-in
         gsap.from('nav', { y: -100, autoAlpha: 0, duration: 1, delay: 1.5, ease: "power3.out" });
         
+        // Feature Cards (FIXED: Added scroller: smoother.content())
         gsap.utils.toArray('.card').forEach(card => {
             gsap.from(card, {
                 y: 100, 
@@ -951,11 +954,13 @@
                     trigger: card, 
                     start: 'top 90%', 
                     toggleActions: 'play none none none',
+                    // 🛑 CRITICAL FIX 1 🛑
                     scroller: smoother.content() 
                 }
             });
         });
         
+        // Split Section (FIXED: Added scroller: smoother.content())
         gsap.from('.split-content, .split-image', {
             autoAlpha: 0, 
             x: (i) => i % 2 === 0 ? -100 : 100, 
@@ -966,11 +971,12 @@
                 trigger: '.split-section', 
                 start: 'top 70%', 
                 toggleActions: 'play none none none',
+                // 🛑 CRITICAL FIX 2 🛑
                 scroller: smoother.content() 
             }
         });
 
-        // Custom Cursor Logic
+        // Custom Cursor Logic (Kept as is)
         const cursor = document.querySelector('.cursor');
         const follower = document.querySelector('.cursor-follower');
 
@@ -992,6 +998,7 @@
     }
 
     // --- B. Video Scroll-Control (Requires all assets/metadata to be loaded) ---
+    // Use 'window.load' to ensure the video's duration is ready
     window.addEventListener('load', function() {
         if (video && smoother) {
             
@@ -1005,6 +1012,7 @@
             // Set up video scrubbing only when metadata is loaded
             video.addEventListener('loadedmetadata', function() {
                 const duration = video.duration;
+                // Scroll length = video duration (seconds) * factor (400 pixels/second recommended)
                 const scrollLength = duration * 400; 
 
                 let tl = gsap.timeline({
@@ -1014,12 +1022,14 @@
                         start: 'top top',
                         end: `+=${scrollLength}`, 
                         scrub: true, 
-                        markers: false,
+                        markers: false, // Set to 'true' for debugging
                         anticipatePin: 1,
+                        // 🛑 CRITICAL FIX 3: Tells the video trigger to listen to ScrollSmoother's scroll 🛑
                         scroller: smoother.content() 
                     }
                 });
                 
+                // Animate the video's currentTime property
                 tl.to(video, {
                     currentTime: duration, 
                     duration: duration, 
