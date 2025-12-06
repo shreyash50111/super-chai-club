@@ -1047,22 +1047,48 @@
 <script>
         gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-        // Force video play on page load
-        window.addEventListener('DOMContentLoaded', function() {
-            const video = document.querySelector('.hero-video');
-            if (video) {
-                video.play().catch(err => {
-                    console.log('Video autoplay failed:', err);
-                });
-            }
-        });
-
-        // Check if mobile/tablet
+        // --- Configuration Variables ---
+        const video = document.querySelector('.hero-video');
         const isMobile = window.innerWidth < 768;
-        const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
-        const isDesktop = window.innerWidth >= 1024;
+        
+        // Force video play on load (needed for many browsers to allow .play() later)
+        if (video) {
+            video.play().catch(() => {});
+            video.pause(); // Immediately pause it so scroll can take over
+        }
 
-        // Mobile Menu Toggle
+        // --- 1. Video Scroll-Control and Pinning ---
+        if (video) {
+            // Ensure the video length is available before setting up ScrollTrigger
+            video.addEventListener('loadedmetadata', () => {
+                const duration = video.duration;
+
+                // Calculate the scroll length based on video duration (e.g., 5000px)
+                // We use a longer scroll duration to make the effect noticeable
+                const scrollLength = duration * 300; // Adjust '300' for slower/faster scroll speed
+
+                // Create the animation timeline to control the video playback
+                let tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: '.hero',
+                        pin: true, // PIN the entire section
+                        start: 'top top',
+                        end: `+=${scrollLength}`, // Pin ends after the video-controlled scroll distance
+                        scrub: true, // Link playback to scroll position
+                        markers: false // Set to true for debugging
+                    }
+                });
+                
+                // Animate a dummy object to control the video's currentTime
+                tl.to(video, {
+                    currentTime: duration, // Animate currentTime from 0 to video duration
+                    duration: duration, 
+                    ease: "none"
+                });
+            });
+        }
+
+        // --- 2. Mobile Menu and Smooth Scroll ---
         const menuToggle = document.querySelector('.menu-toggle');
         const navLinks = document.querySelector('.nav-links');
         
@@ -1071,20 +1097,18 @@
             navLinks.classList.toggle('active');
         });
 
-        // Close menu and smooth scroll on link click (mobile)
         document.querySelectorAll('.nav-links a').forEach(link => {
             link.addEventListener('click', (e) => {
-                e.preventDefault(); // Prevent default jump
+                e.preventDefault();
                 menuToggle.classList.remove('active');
                 navLinks.classList.remove('active');
-                
                 const target = link.getAttribute('href');
                 gsap.to(window, {duration: 1.5, scrollTo: target, ease: "power3.inOut"});
             });
         });
 
 
-        // Preloader Animation and Removal
+        // --- 3. Preloader Animation and Removal ---
         const preloader = document.querySelector('.preloader');
         const preloaderText = document.querySelector('.preloader-text');
         
@@ -1105,61 +1129,46 @@
                 }
             });
 
-        // Navigation Scroll-in Animation for Desktop
-        if (isDesktop) {
+
+        // --- 4. Content Scroll Animations (Enabled only if not mobile) ---
+        if (!isMobile) {
+            // Navigation Scroll-in Animation
             gsap.from('nav', {
                 y: -100,
                 autoAlpha: 0,
                 duration: 1,
-                delay: 2, // Wait for preloader to finish
+                delay: 2, 
                 ease: "power3.out"
             });
-        }
-        
-        // --- 🎯 NEW GSAP PINNING LOGIC 🎯 ---
-        // Hero Video Pinning (makes the video stick while other content scrolls up)
-        gsap.to('.hero-content', { 
-            scrollTrigger: {
-                trigger: '.hero',
-                pin: true, 
-                start: 'top top', 
-                end: '+=1000', // Pin lasts for 1000px of scroll
-                scrub: true, 
-                anticipatePin: 1
-            }
-        });
-        // --- 🎯 END OF NEW GSAP PINNING LOGIC 🎯 ---
+            
+            // Feature Cards ScrollTrigger Animation
+            gsap.from('.card', {
+                y: 100,
+                autoAlpha: 0,
+                stagger: 0.2,
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: '.features',
+                    start: 'top 80%', 
+                    toggleActions: 'play none none none'
+                }
+            });
 
+            // Split Section Fade-in Animation
+            gsap.from('.split-content, .split-image', {
+                autoAlpha: 0,
+                x: (i) => i % 2 === 0 ? -100 : 100, 
+                duration: 1.5,
+                stagger: 0.5,
+                ease: "power3.out",
+                scrollTrigger: {
+                    trigger: '.split-section',
+                    start: 'top 70%',
+                    toggleActions: 'play none none none'
+                }
+            });
 
-        // Feature Cards ScrollTrigger Animation
-        gsap.from('.card', {
-            y: 100,
-            autoAlpha: 0,
-            stagger: 0.2,
-            ease: "power2.out",
-            scrollTrigger: {
-                trigger: '.features',
-                start: 'top 80%', 
-                toggleActions: 'play none none none'
-            }
-        });
-
-        // Split Section Fade-in Animation
-        gsap.from('.split-content, .split-image', {
-            autoAlpha: 0,
-            x: (i) => i % 2 === 0 ? -100 : 100, 
-            duration: 1.5,
-            stagger: 0.5,
-            ease: "power3.out",
-            scrollTrigger: {
-                trigger: '.split-section',
-                start: 'top 70%',
-                toggleActions: 'play none none none'
-            }
-        });
-
-        // Custom Cursor Logic (Desktop Only)
-        if (isDesktop) {
+            // Custom Cursor Logic (Desktop Only)
             const cursor = document.querySelector('.cursor');
             const follower = document.querySelector('.cursor-follower');
 
