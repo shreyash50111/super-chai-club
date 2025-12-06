@@ -18,15 +18,16 @@
 
         :root {
             --primary: #D4A574;
-            --dark: #1a0f0a;
+            --dark: #3d2817;
             --accent: #FF6B35;
             --light: #FFF5E6;
             --gold: #FFD700;
+            --bg-light: #4a3425;
         }
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: #2a1a10;
+            background: var(--bg-light);
             color: var(--light);
             overflow-x: hidden;
         }
@@ -197,7 +198,7 @@
             width: auto;
             height: auto;
             transform: translate(-50%, -50%);
-            filter: brightness(0.6);
+            filter: brightness(0.7);
             object-fit: cover;
         }
 
@@ -208,7 +209,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(to bottom, rgba(26, 15, 10, 0.3), rgba(26, 15, 10, 0.5));
+            background: linear-gradient(to bottom, rgba(61, 40, 23, 0.2), rgba(61, 40, 23, 0.4));
             z-index: 1;
         }
 
@@ -335,7 +336,7 @@
         /* Feature Cards */
         .features {
             padding: clamp(4rem, 10vw, 10rem) 5%;
-            background: #2a1a10;
+            background: var(--bg-light);
             position: relative;
         }
 
@@ -425,7 +426,7 @@
         /* Image Gallery */
         .gallery {
             padding: clamp(4rem, 10vw, 10rem) 5%;
-            background: #2a1a10;
+            background: var(--dark);
         }
 
         .gallery-grid {
@@ -443,11 +444,6 @@
             cursor: pointer;
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
             aspect-ratio: 1;
-        }
-
-        .gallery-item:first-child {
-            grid-column: 1 / -1;
-            aspect-ratio: 21/9;
         }
 
         .gallery-item img {
@@ -486,7 +482,7 @@
         /* Menu Section */
         .menu {
             padding: clamp(4rem, 10vw, 10rem) 5%;
-            background: linear-gradient(135deg, var(--dark) 0%, #2a1a10 100%);
+            background: var(--bg-light);
             position: relative;
         }
 
@@ -570,7 +566,7 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            background: #2a1a10;
+            background: var(--dark);
             order: 2;
         }
 
@@ -621,8 +617,23 @@
         /* Location */
         .location {
             padding: clamp(4rem, 10vw, 10rem) 5%;
-            background: #2a1a10;
+            background: var(--bg-light);
             text-align: center;
+        }
+
+        .map-container {
+            max-width: 1000px;
+            margin: 3rem auto;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            height: 450px;
+        }
+
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
 
         .location-card {
@@ -692,11 +703,6 @@
 
             .gallery-item {
                 aspect-ratio: 1;
-            }
-
-            .gallery-item:first-child {
-                grid-column: 1 / -1;
-                aspect-ratio: 21/9;
             }
         }
 
@@ -786,11 +792,6 @@
             .gallery-item {
                 aspect-ratio: 4/3;
             }
-
-            .gallery-item:first-child {
-                grid-column: 1;
-                aspect-ratio: 4/3;
-            }
         }
 
         /* Small Mobile */
@@ -847,7 +848,7 @@
 
     <section id="home" class="hero">
         <video class="hero-video" autoplay muted loop playsinline preload="auto">
-            <source src="./tea.mp4" type="video/mp4">
+            <source src="tea.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
         <div class="float-element float-1"></div>
@@ -904,7 +905,7 @@
             <div class="gallery-item">
                 <img src="image1.jpg" alt="Signature Chai">
                 <div class="gallery-overlay">
-                    <h3 class="gallery-title">Our Signature Jaggery Chai</h3>
+                    <h3 class="gallery-title">Signature Jaggery Chai</h3>
                 </div>
             </div>
             <div class="gallery-item">
@@ -995,6 +996,10 @@
             </div>
             
             <p class="location-text" style="margin-top: 3rem; font-style: italic;">Part of V6 Group</p>
+        </div>
+
+        <div class="map-container">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3887.4449584442786!2d77.69824097507654!3d13.010628987302891!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae11f7e2d3e9f1%3A0x7c6f8e8e8e8e8e8e!2sSri%20Swastik%20Plaza!5e0!3m2!1sen!2sin!4v1234567890123!5m2!1sen!2sin" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
         </div>
     </section>
 
