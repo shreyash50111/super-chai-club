@@ -721,7 +721,7 @@
 
             <section id="home" class="hero">
                 <video class="hero-video" autoplay muted loop playsinline preload="metadata">
-                    <source src="demo.webm" type="video/webm">
+                    <source src="demo.mp4" type="video/mp4">
                 </video>
                 <div class="float-element float-1"></div>
                 <div class="float-element float-2"></div>
@@ -927,7 +927,7 @@
         });
     }
     
-    // 3. Navigation and Menu Logic (Same as before)
+    // 3. Navigation and Menu Logic (Omitted for brevity, but kept in the file)
     const menuToggle = document.querySelector('.menu-toggle');
     const navLinks = document.querySelector('.nav-links');
     
@@ -951,7 +951,7 @@
         });
     });
 
-    // 4. Content Scroll Animations & Hover (Same as before)
+    // 4. Content Scroll Animations & Hover (Omitted for brevity, but kept in the file)
     if (!isMobile) {
         gsap.from('nav', { y: -100, autoAlpha: 0, duration: 1, delay: 1.5, ease: "power3.out" });
         
@@ -984,7 +984,6 @@
             }
         });
 
-        // HOVER ANIMATIONS RESTORED
         const cursor = document.querySelector('.cursor');
         const follower = document.querySelector('.cursor-follower');
 
@@ -1005,47 +1004,55 @@
         }
     }
 
-    // --- B. Video Scroll-Control (Final 4-Second Scrub) ---
-    window.addEventListener('load', function() {
-        if (video && smoother) {
+    // --- B. Video Scroll-Control (Final Direct Update) ---
+    // Start this logic immediately, not waiting for window.onload
+    if (video && smoother) {
+        
+        const duration = 4; 
+        const scrollLength = duration * 400; 
+
+        // 1. Force video loading and pause
+        // Use a function to ensure this runs after the page is visible, but not reliant on full load
+        const initializeVideo = () => {
+             // Make sure loop is off if it's there
+            video.loop = false;
             
-            // 1. Attempt Autoplay and Pause
+            // Attempt to play/pause to force readiness
             video.play().catch(error => {
-                console.warn("Autoplay was prevented by the browser:", error);
-            }).then(() => {
-                // Ensure it's paused immediately for scroll control
+                console.warn("Autoplay was prevented:", error);
+            }).finally(() => {
                 video.pause();
+                video.currentTime = 0;
             });
+        };
 
-            // 🛑 CRITICAL FIX: HARD-CODED DURATION 🛑
-            const duration = 4; // Confirmed 4-second video length
-            console.log("Video Duration Set (Hard-Coded):", duration, "seconds.");
-
-            // Calculate scroll space needed (400 pixels of scroll per second)
-            const scrollLength = duration * 400; // 1600 pixels of scrolling
-
-            // 2. Create the ScrollTrigger Timeline IMMEDIATELY
-            let tl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: '.hero',
-                    pin: true, 
-                    start: 'top top',
-                    end: `+=${scrollLength}`, // 1600 pixels total
-                    scrub: true, 
-                    markers: true, // KEEP THIS ON!
-                    anticipatePin: 1,
-                    scroller: smoother.content() // Links to ScrollSmoother
-                }
-            });
-            
-            // 3. Animate the video's currentTime property from 0 to 4
-            tl.to(video, {
-                currentTime: duration, // Animate to 4.0 seconds
-                duration: duration, 
-                ease: "none"
-            });
+        // Run video setup
+        if (document.readyState === 'complete') {
+            initializeVideo();
+        } else {
+            window.addEventListener('load', initializeVideo);
         }
-    });
+
+        // 2. Create the ScrollTrigger with the onUpdate function
+        ScrollTrigger.create({
+            trigger: '.hero',
+            pin: true, 
+            start: 'top top',
+            end: `+=${scrollLength}`, // 1600 pixels total
+            scrub: true, 
+            markers: true, 
+            anticipatePin: 1,
+            scroller: smoother.content(),
+            
+            // 🛑 THE CRITICAL CHANGE: Use onUpdate to manually set currentTime 🛑
+            onUpdate: (self) => {
+                // self.progress is 0 at start, 1 at end. 
+                // We multiply the progress by the total duration (4 seconds)
+                video.currentTime = self.progress * duration;
+            }
+        });
+    }
+
 </script>
 </body>
 </html>
