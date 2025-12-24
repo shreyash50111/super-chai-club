@@ -691,6 +691,21 @@
                 display: none;
             }
         }
+        /* Ensure the hero content is behind the scrolling content */
+.hero-content {
+    /* ... other styles ... */
+    position: relative;
+    z-index: 5; 
+}
+
+/* Ensure the sections that scroll up have a higher z-index */
+.marquee-section,
+#why-different {
+    position: relative; /* Must be relative or absolute/fixed */
+    z-index: 10; /* Must be higher than hero-content */
+    /* Add a background color so you can't see through it */
+    background-color: #f77a3d; 
+}
     </style>
 </head>
 <body>
@@ -701,8 +716,6 @@
         <div class="preloader-text">SUPER CHAI CLUB</div>
     </div>
 
-    <div id="smooth-wrapper">
-        <div id="smooth-content">
 
             <nav>
                 <div class="logo">SCC</div>
@@ -880,9 +893,7 @@
                 <p class="footer-text">Crafted with Jaggery & Love</p>
             </footer>
 
-        </div>
-    </div>
-<script>
+      <script>
     gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
     // --- Configuration Variables ---
