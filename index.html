@@ -120,7 +120,8 @@
     <div class="preloader">
         <div class="preloader-text">SUPER CHAI CLUB</div>
     </div>
-
+        <div id="smooth-wrapper">
+		<div id="smooth-content">
     <nav>
         <div class="logo">SCC</div>
         <ul class="nav-links">
@@ -176,10 +177,16 @@
         <p style="opacity: 0.7; margin-bottom: 2rem;">Hyderabad, India • Est. 2024</p>
         <div style="font-size: 0.8rem; letter-spacing: 2px; opacity: 0.5;">© 2024 SUPER CHAI CLUB. ALL RIGHTS RESERVED.</div>
     </footer>
-
+    </div>
+	</div>
 <script>
-    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-
+    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin, ScrollSmoother);
+    // create the scrollSmoother before your scrollTriggers
+ScrollSmoother.create({
+	smooth: 1, // how long (in seconds) it takes to "catch up" to the native scroll position
+	effects: true, // looks for data-speed and data-lag attributes on elements
+	smoothTouch: 0.1 // much shorter smoothing time on touch devices (default is NO smoothing on touch devices)
+});
     // 1. --- PRELOADER & CURSOR ---
     const preloader = document.querySelector('.preloader');
     const preloaderText = document.querySelector('.preloader-text');
