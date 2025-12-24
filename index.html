@@ -4,17 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Chai Club - Jaggery Chai Excellence</title>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Poppins:wght@300;400;600;700&display=swap');
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
             --primary: #D4A574;
@@ -22,8 +20,6 @@
             --accent: #FF6B35;
             --light: #FFF5E6;
             --gold: #FFD700;
-            --bg-light: #8B7355;
-            --bg-lighter: #a89178;
         }
 
         body {
@@ -33,93 +29,7 @@
             overflow-x: hidden;
         }
 
-        html {
-            scroll-behavior: smooth;
-        }
-
-        /* Smooth Scroller */
-        * {
-            scrollbar-width: thin;
-            scrollbar-color: var(--primary) var(--dark);
-        }
-
-        *::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        *::-webkit-scrollbar-track {
-            background: var(--dark);
-        }
-
-        *::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 5px;
-        }
-
-        *::-webkit-scrollbar-thumb:hover {
-            background: var(--gold);
-        }
-
-        /* Custom Cursor - Desktop Only */
-        .cursor,
-        .cursor-follower {
-            display: none;
-        }
-
-        @media (min-width: 1024px) {
-            body {
-                cursor: none;
-            }
-
-            .cursor {
-                width: 20px;
-                height: 20px;
-                border: 2px solid var(--primary);
-                border-radius: 50%;
-                position: fixed;
-                pointer-events: none;
-                z-index: 9999;
-                transition: all 0.1s ease;
-                mix-blend-mode: difference;
-                display: block;
-            }
-
-            .cursor-follower {
-                width: 50px;
-                height: 50px;
-                border: 1px solid var(--accent);
-                border-radius: 50%;
-                position: fixed;
-                pointer-events: none;
-                z-index: 9998;
-                transition: all 0.3s ease;
-                mix-blend-mode: difference;
-                display: block;
-            }
-        }
-
-        /* Preloader */
-        .preloader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: var(--dark);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-        }
-
-        .preloader-text {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2rem, 8vw, 5rem);
-            font-weight: 900;
-            color: var(--primary);
-            text-align: center;
-            padding: 0 1rem;
-        }
+        html { scroll-behavior: auto; } /* Let GSAP ScrollTo handle smoothing */
 
         /* Navigation */
         nav {
@@ -135,79 +45,11 @@
             backdrop-filter: blur(10px);
         }
 
-        .logo {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(1.5rem, 4vw, 2.5rem);
-            font-weight: 900;
-            color: var(--light);
-            letter-spacing: 2px;
-        }
+        .logo { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; color: var(--light); }
+        .nav-links { display: flex; gap: 2rem; list-style: none; }
+        .nav-links a { color: var(--light); text-decoration: none; font-weight: 600; text-transform: uppercase; }
 
-        .menu-toggle {
-            display: none;
-            flex-direction: column;
-            gap: 6px;
-            cursor: pointer;
-            z-index: 1001;
-            width: 30px;
-            height: 24px;
-            position: relative;
-        }
-
-        .menu-toggle span {
-            width: 100%;
-            height: 3px;
-            background: var(--primary);
-            transition: all 0.3s ease;
-            border-radius: 2px;
-        }
-
-        .menu-toggle.active span:nth-child(1) {
-            transform: rotate(45deg) translate(8px, 8px);
-        }
-
-        .menu-toggle.active span:nth-child(2) {
-            opacity: 0;
-            transform: translateX(-20px);
-        }
-
-        .menu-toggle.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(8px, -8px);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: clamp(1.5rem, 3vw, 3rem);
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: var(--light);
-            text-decoration: none;
-            font-size: clamp(0.9rem, 1.5vw, 1rem);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            position: relative;
-            transition: all 0.3s;
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary);
-            transition: width 0.3s;
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        /* Hero Section */
+        /* Hero & Video */
         .hero {
             height: 100vh;
             position: relative;
@@ -215,6 +57,7 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            background: #000;
         }
 
         .hero-video {
@@ -226,643 +69,47 @@
             width: auto;
             height: auto;
             transform: translate(-50%, -50%);
-            filter: brightness(0.85);
             object-fit: cover;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(to bottom, rgba(92, 74, 58, 0.1), rgba(92, 74, 58, 0.3));
-            z-index: 1;
+            z-index: 0;
         }
 
         .hero-content {
             position: relative;
             z-index: 2;
             text-align: center;
-            padding: 0 1rem;
         }
 
-        .hero-title {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2.5rem, 10vw, 8rem);
-            font-weight: 900;
-            color: var(--light);
-            line-height: 1;
-            margin-bottom: 2rem;
-        }
+        .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(3rem, 8vw, 7rem); margin-bottom: 1rem; }
 
-        .hero-subtitle {
-            font-size: clamp(1rem, 3vw, 2rem);
-            color: var(--primary);
-            letter-spacing: clamp(2px, 1vw, 8px);
-            text-transform: uppercase;
-            font-weight: 300;
-        }
-
-        .scroll-indicator {
-            position: absolute;
-            bottom: 5%;
-            left: 50%;
-            transform: translateX(-50%);
-            text-align: center;
-        }
-
-        .scroll-text {
-            font-size: 0.9rem;
-            letter-spacing: 3px;
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-        }
-
-        .scroll-line {
-            width: 2px;
-            height: 50px;
-            background: var(--primary);
-            margin: 0 auto;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .scroll-line::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 30px;
-            background: var(--accent);
-            animation: scrollAnim 2s infinite;
-        }
-
-        @keyframes scrollAnim {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(300%); }
-        }
-
-        /* Floating Elements */
-        .float-element {
-            position: absolute;
-            pointer-events: none;
-            opacity: 0.1;
-        }
-
-        .float-1 {
-            width: 100px;
-            height: 100px;
-            background: var(--primary);
-            border-radius: 50%;
-            top: 20%;
-            left: 10%;
-        }
-
-        .float-2 {
-            width: 150px;
-            height: 150px;
-            background: var(--accent);
-            border-radius: 50%;
-            top: 60%;
-            right: 15%;
-        }
-
-        /* Marquee Section */
-        .marquee-section {
-            padding: clamp(2rem, 5vw, 5rem) 0;
-            background: var(--accent);
-            overflow: hidden;
-            position: relative;
-        }
-
-        .marquee {
-            display: flex;
-            white-space: nowrap;
-        }
-
-        .marquee-content {
-            display: flex;
-            animation: marquee 20s linear infinite;
-        }
-
-        .marquee-item {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2rem, 6vw, 4rem);
-            font-weight: 900;
-            color: var(--dark);
-            margin: 0 clamp(1.5rem, 3vw, 3rem);
-        }
-
-        @keyframes marquee {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
+        /* Generic Sections for Scrolling */
+        section { padding: 100px 5%; min-height: 80vh; }
+        .section-title { font-family: 'Playfair Display', serif; font-size: 3rem; color: var(--primary); text-align: center; margin-bottom: 50px; }
 
         /* Feature Cards */
-        .features {
-            padding: clamp(4rem, 10vw, 10rem) 5%;
+        .cards-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .card { background: rgba(255,255,255,0.1); padding: 40px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); }
+
+        /* Preloader */
+        .preloader {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100vh;
             background: var(--dark);
-            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 10000;
         }
-
-        .section-title {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2.5rem, 8vw, 6rem);
-            font-weight: 900;
-            text-align: center;
-            margin-bottom: clamp(3rem, 5vw, 5rem);
-            color: var(--primary);
-        }
-
-        .cards-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
-            gap: clamp(2rem, 3vw, 3rem);
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
-            border-radius: 25px;
-            padding: clamp(2rem, 4vw, 3rem);
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.4s ease;
-            min-height: 300px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            backdrop-filter: blur(10px);
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, var(--primary), var(--accent), var(--gold));
-            border-radius: 25px;
-            z-index: -1;
-            opacity: 0;
-            transition: opacity 0.4s;
-        }
-
-        .card:hover::before {
-            opacity: 1;
-        }
-
-        .card:hover {
-            transform: translateY(-15px) rotateZ(2deg);
-        }
-
-        .card-number {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(5rem, 12vw, 8rem);
-            font-weight: 900;
-            color: rgba(255, 255, 255, 0.08);
-            position: absolute;
-            top: -1rem;
-            right: 1rem;
-            line-height: 1;
-        }
-
-        .card-title {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(1.8rem, 3vw, 2.5rem);
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            color: var(--primary);
-            position: relative;
-            z-index: 1;
-        }
-
-        .card-desc {
-            font-size: clamp(1rem, 1.5vw, 1.1rem);
-            line-height: 1.8;
-            color: var(--light);
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Image Gallery */
-        .gallery {
-            padding: clamp(4rem, 10vw, 10rem) 5%;
-            background: var(--dark);
-            position: relative;
-        }
-
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: clamp(1.5rem, 2vw, 2rem);
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .gallery-item {
-            position: relative;
-            overflow: hidden;
-            border-radius: 20px;
-            cursor: pointer;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            aspect-ratio: 1;
-        }
-
-        .gallery-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.8s ease;
-        }
-
-        .gallery-item:hover img {
-            transform: scale(1.15);
-        }
-
-        .gallery-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: clamp(2rem, 4vw, 3rem);
-            background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
-            transform: translateY(100%);
-            transition: transform 0.5s ease;
-        }
-
-        .gallery-item:hover .gallery-overlay {
-            transform: translateY(0);
-        }
-
-        .gallery-title {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(1.5rem, 3vw, 2.5rem);
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        /* Menu Section */
-        .menu {
-            padding: clamp(4rem, 10vw, 10rem) 5%;
-            background: var(--dark);
-            position: relative;
-        }
-
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
-            gap: clamp(1.5rem, 2vw, 2rem);
-            max-width: 1400px;
-            margin: clamp(3rem, 5vw, 5rem) auto 0;
-        }
-
-        .menu-item {
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.4);
-            border-radius: 20px;
-            padding: clamp(2rem, 4vw, 3rem);
-            text-align: center;
-            position: relative;
-            transition: all 0.5s ease;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
-        }
-
-        .menu-item::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
-            transform: translate(-50%, -50%);
-            transition: all 0.5s ease;
-            opacity: 0.2;
-        }
-
-        .menu-item:hover::before {
-            width: 400px;
-            height: 400px;
-        }
-
-        .menu-item:hover {
-            background: rgba(255, 255, 255, 0.35);
-            border-color: var(--gold);
-            transform: translateY(-10px) scale(1.05);
-        }
-
-        .menu-item-title {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(1.5rem, 2.5vw, 2rem);
-            font-weight: 700;
-            color: var(--gold);
-            margin-bottom: 1rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .menu-item-desc {
-            font-size: clamp(0.9rem, 1.2vw, 1rem);
-            color: var(--light);
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Split Section */
-        .split-section {
-            display: grid;
-            grid-template-columns: 1fr;
-            min-height: auto;
-            position: relative;
-        }
-
-        .split-image {
-            background-size: cover;
-            background-position: center;
-            position: relative;
-            min-height: 50vh;
-            order: 1;
-        }
-
-        .split-content {
-            padding: clamp(3rem, 8vw, 10rem) clamp(2rem, 5vw, 5rem);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            background: var(--dark);
-            order: 2;
-        }
-
-        .split-title {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2.5rem, 7vw, 5rem);
-            font-weight: 900;
-            color: var(--primary);
-            margin-bottom: 2rem;
-            line-height: 1.1;
-        }
-
-        .split-text {
-            font-size: clamp(1.1rem, 2vw, 1.3rem);
-            line-height: 1.9;
-            color: var(--light);
-            margin-bottom: 2rem;
-        }
-
-        .benefits-list {
-            list-style: none;
-            margin-top: clamp(2rem, 3vw, 3rem);
-        }
-
-        .benefits-list li {
-            font-size: clamp(1.1rem, 1.8vw, 1.3rem);
-            padding: clamp(1.2rem, 2vw, 1.5rem) 0;
-            border-bottom: 1px solid rgba(212, 165, 116, 0.2);
-            color: var(--light);
-            display: flex;
-            align-items: center;
-            transition: all 0.3s ease;
-        }
-
-        .benefits-list li:hover {
-            padding-left: 1rem;
-            border-color: var(--accent);
-        }
-
-        .benefits-list li::before {
-            content: '✦';
-            color: var(--accent);
-            font-size: clamp(1.2rem, 2vw, 1.5rem);
-            margin-right: clamp(1rem, 2vw, 1.5rem);
-            flex-shrink: 0;
-        }
-
-        /* Location */
-        .location {
-            padding: clamp(4rem, 10vw, 10rem) 5%;
-            background: var(--dark);
-            text-align: center;
-            position: relative;
-        }
-
-        .map-container {
-            max-width: 1000px;
-            margin: 3rem auto;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            height: 450px;
-        }
-
-        .map-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        .location-card {
-            max-width: 1000px;
-            margin: clamp(3rem, 5vw, 5rem) auto 0;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 30px;
-            padding: clamp(3rem, 5vw, 5rem);
-            border: 2px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            backdrop-filter: blur(10px);
-        }
-
-        .location-title {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2rem, 4vw, 3rem);
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 2rem;
-        }
-
-        .location-text {
-            font-size: clamp(1.1rem, 2vw, 1.3rem);
-            line-height: 1.9;
-            color: var(--light);
-            margin-bottom: 1rem;
-        }
-
-        .hours-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
-            gap: clamp(1.5rem, 2vw, 2rem);
-            margin-top: clamp(2rem, 3vw, 3rem);
-        }
-
-        .hours-item {
-            background: rgba(255, 255, 255, 0.25);
-            padding: clamp(2rem, 2vw, 2.5rem);
-            border-radius: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.4);
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .hours-item:hover {
-            transform: scale(1.05);
-            border-color: var(--gold);
-            background: rgba(255, 255, 255, 0.35);
-        }
-
-        /* Footer */
-        footer {
-            padding: clamp(3rem, 5vw, 5rem) 5%;
-            background: var(--dark);
-            text-align: center;
-            border-top: 2px solid var(--gold);
-            position: relative;
-        }
-
-        .footer-text {
-            font-size: clamp(1rem, 1.5vw, 1.2rem);
-            color: var(--primary);
-            margin-bottom: 1rem;
-        }
-
-        /* Tablet Styles */
-        @media (min-width: 768px) {
-            .gallery-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-
-            .gallery-item {
-                aspect-ratio: 1;
-            }
-        }
-
-        @media (min-width: 768px) and (max-width: 1023px) {
-            .split-section {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .split-image {
-                min-height: 100%;
-            }
-        }
-
-        /* Desktop Styles */
-        @media (min-width: 1024px) {
-            .split-section {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .split-image {
-                min-height: 100vh;
-            }
-
-            nav {
-                background: transparent;
-            }
-        }
+        .preloader-text { font-family: 'Playfair Display', serif; font-size: 3rem; color: var(--primary); }
 
         /* Mobile Menu */
-        @media (max-width: 767px) {
-            .menu-toggle {
-                display: flex;
-            }
+        .menu-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+        .menu-toggle span { width: 25px; height: 3px; background: var(--primary); }
 
-            .nav-links {
-                position: fixed;
-                top: 0;
-                right: -100%;
-                width: 100%;
-                height: 100vh;
-                background: rgba(26, 15, 10, 0.98);
-                backdrop-filter: blur(20px);
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                gap: 3rem;
-                transition: right 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-                padding: 2rem;
-            }
-
-            .nav-links.active {
-                right: 0;
-            }
-
-            .nav-links li {
-                opacity: 0;
-                transform: translateX(50px);
-                transition: all 0.5s ease;
-            }
-
-            .nav-links.active li {
-                opacity: 1;
-                transform: translateX(0);
-            }
-
-            .nav-links.active li:nth-child(1) { transition-delay: 0.1s; }
-            .nav-links.active li:nth-child(2) { transition-delay: 0.2s; }
-            .nav-links.active li:nth-child(3) { transition-delay: 0.3s; }
-            .nav-links.active li:nth-child(4) { transition-delay: 0.4s; }
-
-            .nav-links a {
-                font-size: 2rem;
-            }
-
-            .scroll-indicator {
-                display: none;
-            }
-
-            .card {
-                min-height: 250px;
-            }
-
-            .gallery-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .gallery-item {
-                aspect-ratio: 4/3;
-            }
-        }
-
-        /* Small Mobile */
-        @media (max-width: 480px) {
-            .hero-title {
-                font-size: 2.2rem;
-            }
-
-            nav {
-                padding: 1rem 5%;
-            }
-
-            .marquee-item {
-                font-size: 1.8rem;
-            }
-        }
-
-        /* Landscape Mobile */
-        @media (max-height: 500px) and (orientation: landscape) {
-            .hero {
-                height: auto;
-                min-height: 100vh;
-                padding: 8rem 0 3rem;
-            }
-
-            .scroll-indicator {
-                display: none;
-            }
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .menu-toggle { display: flex; }
         }
     </style>
 </head>
 <body>
-    <div class="cursor"></div>
-    <div class="cursor-follower"></div>
 
     <div class="preloader">
         <div class="preloader-text">SUPER CHAI CLUB</div>
@@ -870,332 +117,108 @@
 
     <nav>
         <div class="logo">SCC</div>
-        <div class="menu-toggle">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
+        <div class="menu-toggle"><span></span><span></span><span></span></div>
         <ul class="nav-links">
             <li><a href="#home">Home</a></li>
+            <li><a href="#features">About</a></li>
             <li><a href="#menu">Menu</a></li>
-            <li><a href="#story">Story</a></li>
-            <li><a href="#location">Visit</a></li>
         </ul>
     </nav>
 
     <section id="home" class="hero">
-        <video class="hero-video" autoplay muted loop playsinline preload="metadata">
-            <source src="tea.webm" type="video/webm">
+        <video class="hero-video" muted playsinline preload="auto">
+            <source src="tea.mp4" type="video/mp4">
         </video>
-        <div class="float-element float-1"></div>
-        <div class="float-element float-2"></div>
         <div class="hero-content">
             <h1 class="hero-title">SUPER CHAI CLUB</h1>
-            <p class="hero-subtitle">Jaggery Perfection</p>
-        </div>
-        <div class="scroll-indicator">
-            <p class="scroll-text">Scroll</p>
-            <div class="scroll-line"></div>
+            <p>Jaggery Perfection</p>
         </div>
     </section>
 
-    <div class="marquee-section">
-        <div class="marquee">
-            <div class="marquee-content">
-                <span class="marquee-item">NO SUGAR ✦</span>
-                <span class="marquee-item">PURE JAGGERY ✦</span>
-                <span class="marquee-item">TRADITIONAL ✦</span>
-                <span class="marquee-item">AUTHENTIC ✦</span>
-                <span class="marquee-item">NO SUGAR ✦</span>
-                <span class="marquee-item">PURE JAGGERY ✦</span>
-                <span class="marquee-item">TRADITIONAL ✦</span>
-                <span class="marquee-item">AUTHENTIC ✦</span>
-            </div>
-        </div>
-    </div>
-
-    <section class="features">
+    <section id="features" class="features">
         <h2 class="section-title">Why We're Different</h2>
         <div class="cards-container">
-            <div class="card">
-                <span class="card-number">01</span>
-                <h3 class="card-title">Zero Sugar</h3>
-                <p class="card-desc">We use only pure, organic jaggery. No refined sugar ever touches our chai. Experience authentic sweetness the way nature intended.</p>
-            </div>
-            <div class="card">
-                <span class="card-number">02</span>
-                <h3 class="card-title">Fresh Ginger</h3>
-                <p class="card-desc">Handpicked ginger adds the perfect warmth and spice. Every batch is made fresh with ingredients sourced daily.</p>
-            </div>
-            <div class="card">
-                <span class="card-number">03</span>
-                <h3 class="card-title">Traditional Brew</h3>
-                <p class="card-desc">Brewed using time-honored techniques passed down through generations. Each cup is crafted with care and precision.</p>
-            </div>
+            <div class="card"><h3>Zero Sugar</h3><p>Pure organic jaggery only.</p></div>
+            <div class="card"><h3>Fresh Ginger</h3><p>Handpicked and brewed fresh.</p></div>
+            <div class="card"><h3>Traditional</h3><p>Time-honored brewing techniques.</p></div>
         </div>
     </section>
 
-    <section class="gallery">
-        <h2 class="section-title">The Experience</h2>
-        <div class="gallery-grid">
-            <div class="gallery-item">
-                <img src="image1.jpg" alt="Signature Chai">
-                <div class="gallery-overlay">
-                    <h3 class="gallery-title">Signature Jaggery Chai</h3>
-                </div>
-            </div>
-            <div class="gallery-item">
-                <img src="image2.jpg" alt="Pure Jaggery">
-                <div class="gallery-overlay">
-                    <h3 class="gallery-title">Pure Organic Jaggery</h3>
-                </div>
-            </div>
-            <div class="gallery-item">
-                <img src="image3.jpg" alt="Fresh Pour">
-                <div class="gallery-overlay">
-                    <h3 class="gallery-title">Poured to Perfection</h3>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="menu" class="menu">
+    <section id="menu" style="background: #4a3c2f;">
         <h2 class="section-title">Our Menu</h2>
-        <div class="menu-grid">
-            <div class="menu-item">
-                <h3 class="menu-item-title">Jaggery Tea</h3>
-                <p class="menu-item-desc">Classic chai with pure jaggery</p>
-            </div>
-            <div class="menu-item">
-                <h3 class="menu-item-title">Ginger Tea</h3>
-                <p class="menu-item-desc">Bold & spicy fresh ginger</p>
-            </div>
-            <div class="menu-item">
-                <h3 class="menu-item-title">Jaggery Ginger</h3>
-                <p class="menu-item-desc">The perfect fusion</p>
-            </div>
-            <div class="menu-item">
-                <h3 class="menu-item-title">Milk Tea</h3>
-                <p class="menu-item-desc">Creamy & comforting</p>
-            </div>
-            <div class="menu-item">
-                <h3 class="menu-item-title">Boost</h3>
-                <p class="menu-item-desc">Energy drink</p>
-            </div>
-            <div class="menu-item">
-                <h3 class="menu-item-title">Lemon Tea</h3>
-                <p class="menu-item-desc">Refreshing & zesty</p>
-            </div>
-            <div class="menu-item">
-                <h3 class="menu-item-title">Lemon Honey</h3>
-                <p class="menu-item-desc">Sweet wellness drink</p>
-            </div>
-            <div class="menu-item">
-                <h3 class="menu-item-title">Osmania Biscuits</h3>
-                <p class="menu-item-desc">Famous Nilofer's & more</p>
-            </div>
-            <div class="menu-item">
-                <h3 class="menu-item-title">Snacks</h3>
-                <p class="menu-item-desc">Perfect pairings</p>
-            </div>
+        <div style="text-align: center; font-size: 1.5rem;">
+            <p>Jaggery Tea • Ginger Tea • Osmania Biscuits</p>
         </div>
     </section>
 
-    <section id="story" class="split-section">
-        <div class="split-image" style="background-image: url('image2.jpg');"></div>
-        <div class="split-content">
-            <h2 class="split-title">The Jaggery Story</h2>
-            <p class="split-text">Jaggery isn't just sweetener—it's tradition, health, and flavor combined. We source the finest organic jaggery to create chai that's both delicious and nutritious.</p>
-            <ul class="benefits-list">
-                <li>100% Natural & Unrefined</li>
-                <li>Rich in Iron & Minerals</li>
-                <li>Boosts Immunity</li>
-                <li>Aids Digestion</li>
-                <li>Deep Caramel Flavor</li>
-            </ul>
-        </div>
-    </section>
-
-    <section id="location" class="location">
-        <h2 class="section-title">Visit Us</h2>
-        <div class="location-card">
-            <h3 class="location-title">Location</h3>
-            <p class="location-text">Sri Swastik Plaza (SSP), Kodigehalli Main Rd</p>
-            <p class="location-text">Opp. Balaji White Woods, Kodigehalli</p>
-            <p class="location-text">Krishnarajapuram, Bengaluru 560067</p>
-            
-            <div class="hours-grid">
-                <div class="hours-item">
-                    <h4 style="color: var(--primary); margin-bottom: 1rem; font-size: clamp(1.2rem, 2vw, 1.5rem);">Open Daily</h4>
-                    <p style="font-size: clamp(1.3rem, 2vw, 1.5rem); font-weight: 600; color: var(--light);">6 AM - 9 PM</p>
-                </div>
-            </div>
-            
-            <p class="location-text" style="margin-top: 3rem; font-style: italic;">Part of V6 Group</p>
-        </div>
-
-        <div class="map-container">
-            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3887.4449584442786!2d77.69824097507654!3d13.010628987302891!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae11f7e2d3e9f1%3A0x7c6f8e8e8e8e8e8e!2sSri%20Swastik%20Plaza!5e0!3m2!1sen!2sin!4v1234567890123!5m2!1sen!2sin" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-        </div>
-    </section>
-
-    <footer>
-        <p class="footer-text">© 2024 Super Chai Club | V6 Group | Bengaluru</p>
-        <p class="footer-text">Crafted with Jaggery & Love</p>
+    <footer style="padding: 50px; text-align: center; background: #2b2118;">
+        <p>© 2024 Super Chai Club</p>
     </footer>
 
 <script>
     gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-    // --- Configuration Variables ---
     const video = document.querySelector('.hero-video');
-    const isMobile = window.innerWidth < 768;
-    
-    // --- Video Ready Listener (Crucial for reliable scroll-control) ---
-    // Wait for the window to load AND the video metadata to load
-    window.addEventListener('load', function() {
-        if (video) {
-            // 1. Force play/pause to enable scroll control
-            video.play().catch(() => {});
-            video.pause();
+    const preloader = document.querySelector('.preloader');
 
-            // 2. Wait for metadata to ensure duration is available
-            video.addEventListener('loadedmetadata', function() {
-                const duration = video.duration;
-                // Calculate scroll length: (video duration in seconds) * (pixels per second)
-                const scrollLength = duration * 300; // 300 is a good starting value for speed
-
-                // --- Video Scroll-Control and Pinning ---
-                let tl = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: '.hero',
-                        pin: true, 
-                        start: 'top top',
-                        end: `+=${scrollLength}`, // Pin lasts exactly as long as required for playback
-                        scrub: true, 
-                        markers: false, // Set to true to see ScrollTrigger boundaries for debugging
-                        // Added to handle potential scroll jumping/lag
-                        anticipatePin: 1 
-                    }
-                });
-                
-                // Animate the video's currentTime from 0 to its full duration
-                tl.to(video, {
-                    currentTime: duration, 
-                    duration: duration, // Use video duration for the timeline duration
-                    ease: "none"
-                });
-            }, { once: true });
-        }
+    // 1. Preloader Logic
+    window.addEventListener('load', () => {
+        gsap.to(preloader, {
+            autoAlpha: 0,
+            duration: 1,
+            onComplete: () => preloader.style.display = 'none'
+        });
     });
 
-    // --- Other Logic (Kept outside the video listener) ---
-
-    // Mobile Menu and Smooth Scroll
-    const menuToggle = document.querySelector('.menu-toggle');
-    const navLinks = document.querySelector('.nav-links');
-    
-    if (menuToggle && navLinks) {
-        menuToggle.addEventListener('click', () => {
-            menuToggle.classList.toggle('active');
-            navLinks.classList.toggle('active');
-        });
-    }
-
+    // 2. Navigation Smooth Scroll
     document.querySelectorAll('.nav-links a').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            menuToggle.classList.remove('active');
-            navLinks.classList.remove('active');
             const target = link.getAttribute('href');
-            gsap.to(window, {duration: 1.5, scrollTo: target, ease: "power3.inOut"});
+            gsap.to(window, { duration: 1, scrollTo: target, ease: "power2.inOut" });
         });
     });
 
+    // 3. --- VIDEO SCRUBBING LOGIC (NATIVE SCROLL) ---
+    if (video) {
+        const duration = 4; // Hard-coded video length
+        const scrollDistance = 2000; // Total pixels to scroll to finish video
 
-    // Preloader Animation and Removal
-    const preloader = document.querySelector('.preloader');
-    const preloaderText = document.querySelector('.preloader-text');
-    
-    if (preloader && preloaderText) {
-        gsap.timeline()
-            .from(preloaderText, {
-                y: '100%',
-                autoAlpha: 0,
-                duration: 1.5,
-                ease: "expo.out"
-            })
-            .to(preloader, {
-                autoAlpha: 0,
-                duration: 1,
-                delay: 0.5,
-                ease: "power2.inOut",
-                onComplete: () => {
-                    preloader.style.display = 'none';
+        // Force browser to "wake up" the video for seeking
+        video.currentTime = 0;
+        video.pause();
+
+        ScrollTrigger.create({
+            trigger: ".hero",
+            start: "top top",
+            end: `+=${scrollDistance}`,
+            pin: true,
+            scrub: true,
+            markers: true, // Keep on to verify the "Start/End" triggers
+            onUpdate: (self) => {
+                // Manually calculate time: Progress (0 to 1) * Duration (4s)
+                const targetTime = self.progress * duration;
+                
+                // Only update if video is ready to prevent flickering
+                if (video.readyState >= 2) {
+                    video.currentTime = targetTime;
                 }
-            });
-    }
-
-
-    // Content Scroll Animations (Enabled only if not mobile)
-    if (!isMobile) {
-        // Navigation Scroll-in Animation
-        gsap.from('nav', {
-            y: -100,
-            autoAlpha: 0,
-            duration: 1,
-            delay: 2, 
-            ease: "power3.out"
-        });
-        
-        // Feature Cards ScrollTrigger Animation
-        gsap.from('.card', {
-            y: 100,
-            autoAlpha: 0,
-            stagger: 0.2,
-            ease: "power2.out",
-            scrollTrigger: {
-                trigger: '.features',
-                start: 'top 80%', 
-                toggleActions: 'play none none none'
             }
         });
-
-        // Split Section Fade-in Animation
-        gsap.from('.split-content, .split-image', {
-            autoAlpha: 0,
-            x: (i) => i % 2 === 0 ? -100 : 100, 
-            duration: 1.5,
-            stagger: 0.5,
-            ease: "power3.out",
-            scrollTrigger: {
-                trigger: '.split-section',
-                start: 'top 70%',
-                toggleActions: 'play none none none'
-            }
-        });
-
-        // Custom Cursor Logic 
-        const cursor = document.querySelector('.cursor');
-        const follower = document.querySelector('.cursor-follower');
-
-        if (cursor && follower) {
-            document.addEventListener('mousemove', (e) => {
-                gsap.to(cursor, {
-                    x: e.clientX,
-                    y: e.clientY,
-                    duration: 0.1,
-                    ease: "power2.out"
-                });
-                gsap.to(follower, {
-                    x: e.clientX - 25, 
-                    y: e.clientY - 25, 
-                    duration: 0.5,
-                    ease: "power3.out"
-                });
-            });
-        }
     }
+
+    // 4. Simple Reveal Animations
+    gsap.from(".card", {
+        scrollTrigger: {
+            trigger: ".features",
+            start: "top 80%"
+        },
+        y: 50,
+        opacity: 0,
+        stagger: 0.2,
+        duration: 1
+    });
 </script>
+
 </body>
 </html>
