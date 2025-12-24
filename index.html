@@ -883,51 +883,53 @@
         </div>
     </div>
 <script>
-    // 1. --- GSAP Plugin Registration ---
-    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin, ScrollSmoother); 
+    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-    let smoother;
-    const isMobile = window.innerWidth < 768;
-    const preloader = document.querySelector('.preloader');
-    const preloaderText = document.querySelector('.preloader-text');
+    // --- Configuration Variables ---
     const video = document.querySelector('.hero-video');
-
-    // --- A. Core Setup (Initialize ScrollSmoother and Run Initial Animations) ---
+    const isMobile = window.innerWidth < 768;
     
-    // Initialize Smoother
-    smoother = ScrollSmoother.create({
-        wrapper: '#smooth-wrapper', 
-        content: '#smooth-content', 
-        smooth: isMobile ? 0 : 1.5,
-        effects: true, 
-        normalizeScroll: true,
-        ignoreMobileResize: true,
+    // --- Video Ready Listener (Crucial for reliable scroll-control) ---
+    // Wait for the window to load AND the video metadata to load
+    window.addEventListener('load', function() {
+        if (video) {
+            // 1. Force play/pause to enable scroll control
+            video.play().catch(() => {});
+            video.pause();
+
+            // 2. Wait for metadata to ensure duration is available
+            video.addEventListener('loadedmetadata', function() {
+                const duration = video.duration;
+                // Calculate scroll length: (video duration in seconds) * (pixels per second)
+                const scrollLength = duration * 300; // 300 is a good starting value for speed
+
+                // --- Video Scroll-Control and Pinning ---
+                let tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: '.hero',
+                        pin: true, 
+                        start: 'top top',
+                        end: `+=${scrollLength}`, // Pin lasts exactly as long as required for playback
+                        scrub: true, 
+                        markers: false, // Set to true to see ScrollTrigger boundaries for debugging
+                        // Added to handle potential scroll jumping/lag
+                        anticipatePin: 1 
+                    }
+                });
+                
+                // Animate the video's currentTime from 0 to its full duration
+                tl.to(video, {
+                    currentTime: duration, 
+                    duration: duration, // Use video duration for the timeline duration
+                    ease: "none"
+                });
+            }, { once: true });
+        }
     });
 
-    // 2. Preloader Animation and Removal
-    if (preloader && preloaderText) {
-        gsap.timeline({
-            delay: 0.2
-        })
-        .from(preloaderText, {
-            y: '100%', 
-            autoAlpha: 0, 
-            duration: 1, 
-            ease: "expo.out"
-        })
-        .to(preloader, {
-            autoAlpha: 0, 
-            duration: 0.8, 
-            delay: 0.3, 
-            ease: "power2.inOut",
-            onComplete: () => { 
-                preloader.style.display = 'none';
-                if (smoother) smoother.refresh(); 
-            }
-        });
-    }
-    
-    // 3. Navigation and Menu Logic (Omitted for brevity, but kept in the file)
+    // --- Other Logic (Kept outside the video listener) ---
+
+    // Mobile Menu and Smooth Scroll
     const menuToggle = document.querySelector('.menu-toggle');
     const navLinks = document.querySelector('.nav-links');
     
@@ -943,116 +945,95 @@
             e.preventDefault();
             menuToggle.classList.remove('active');
             navLinks.classList.remove('active');
-            if (smoother) {
-                smoother.scrollTo(link.getAttribute('href'), true, 'center top');
-            } else {
-                document.querySelector(link.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
-            }
+            const target = link.getAttribute('href');
+            gsap.to(window, {duration: 1.5, scrollTo: target, ease: "power3.inOut"});
         });
     });
 
-    // 4. Content Scroll Animations & Hover (Omitted for brevity, but kept in the file)
-    if (!isMobile) {
-        gsap.from('nav', { y: -100, autoAlpha: 0, duration: 1, delay: 1.5, ease: "power3.out" });
-        
-        gsap.utils.toArray('.card').forEach(card => {
-            gsap.from(card, {
-                y: 100, 
-                autoAlpha: 0, 
-                duration: 1, 
-                ease: "power2.out",
-                scrollTrigger: { 
-                    trigger: card, 
-                    start: 'top 90%', 
-                    toggleActions: 'play none none none',
-                    scroller: smoother.content() 
+
+    // Preloader Animation and Removal
+    const preloader = document.querySelector('.preloader');
+    const preloaderText = document.querySelector('.preloader-text');
+    
+    if (preloader && preloaderText) {
+        gsap.timeline()
+            .from(preloaderText, {
+                y: '100%',
+                autoAlpha: 0,
+                duration: 1.5,
+                ease: "expo.out"
+            })
+            .to(preloader, {
+                autoAlpha: 0,
+                duration: 1,
+                delay: 0.5,
+                ease: "power2.inOut",
+                onComplete: () => {
+                    preloader.style.display = 'none';
                 }
             });
+    }
+
+
+    // Content Scroll Animations (Enabled only if not mobile)
+    if (!isMobile) {
+        // Navigation Scroll-in Animation
+        gsap.from('nav', {
+            y: -100,
+            autoAlpha: 0,
+            duration: 1,
+            delay: 2, 
+            ease: "power3.out"
         });
         
-        gsap.from('.split-content, .split-image', {
-            autoAlpha: 0, 
-            x: (i) => i % 2 === 0 ? -100 : 100, 
-            duration: 1.5, 
-            stagger: 0.5, 
-            ease: "power3.out",
-            scrollTrigger: { 
-                trigger: '.split-section', 
-                start: 'top 70%', 
-                toggleActions: 'play none none none',
-                scroller: smoother.content() 
+        // Feature Cards ScrollTrigger Animation
+        gsap.from('.card', {
+            y: 100,
+            autoAlpha: 0,
+            stagger: 0.2,
+            ease: "power2.out",
+            scrollTrigger: {
+                trigger: '.features',
+                start: 'top 80%', 
+                toggleActions: 'play none none none'
             }
         });
 
+        // Split Section Fade-in Animation
+        gsap.from('.split-content, .split-image', {
+            autoAlpha: 0,
+            x: (i) => i % 2 === 0 ? -100 : 100, 
+            duration: 1.5,
+            stagger: 0.5,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: '.split-section',
+                start: 'top 70%',
+                toggleActions: 'play none none none'
+            }
+        });
+
+        // Custom Cursor Logic 
         const cursor = document.querySelector('.cursor');
         const follower = document.querySelector('.cursor-follower');
 
         if (cursor && follower) {
             document.addEventListener('mousemove', (e) => {
-                gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1, ease: "power2.out" });
-                gsap.to(follower, { x: e.clientX - 25, y: e.clientY - 25, duration: 0.5, ease: "power3.out" });
-            });
-            
-            document.querySelectorAll('a, .card, .menu-item, .gallery-item').forEach(el => {
-                el.addEventListener('mouseenter', () => {
-                    gsap.to(follower, { scale: 1.5, background: 'var(--accent)', duration: 0.3 });
+                gsap.to(cursor, {
+                    x: e.clientX,
+                    y: e.clientY,
+                    duration: 0.1,
+                    ease: "power2.out"
                 });
-                el.addEventListener('mouseleave', () => {
-                    gsap.to(follower, { scale: 1, background: 'transparent', duration: 0.3 });
+                gsap.to(follower, {
+                    x: e.clientX - 25, 
+                    y: e.clientY - 25, 
+                    duration: 0.5,
+                    ease: "power3.out"
                 });
             });
         }
     }
-
-    // --- B. Video Scroll-Control (Final Direct Update) ---
-    // Start this logic immediately, not waiting for window.onload
-    if (video && smoother) {
-        
-        const duration = 4; 
-        const scrollLength = duration * 400; 
-
-        // 1. Force video loading and pause
-        // Use a function to ensure this runs after the page is visible, but not reliant on full load
-        const initializeVideo = () => {
-             // Make sure loop is off if it's there
-            video.loop = false;
-            
-            // Attempt to play/pause to force readiness
-            video.play().catch(error => {
-                console.warn("Autoplay was prevented:", error);
-            }).finally(() => {
-                video.pause();
-                video.currentTime = 0;
-            });
-        };
-
-        // Run video setup
-        if (document.readyState === 'complete') {
-            initializeVideo();
-        } else {
-            window.addEventListener('load', initializeVideo);
-        }
-
-        // 2. Create the ScrollTrigger with the onUpdate function
-        ScrollTrigger.create({
-            trigger: '.hero',
-            pin: true, 
-            start: 'top top',
-            end: `+=${scrollLength}`, // 1600 pixels total
-            scrub: true, 
-            markers: true, 
-            anticipatePin: 1,
-            scroller: smoother.content(),
-            
-            // 🛑 THE CRITICAL CHANGE: Use onUpdate to manually set currentTime 🛑
-            onUpdate: (self) => {
-                // self.progress is 0 at start, 1 at end. 
-                // We multiply the progress by the total duration (4 seconds)
-                video.currentTime = self.progress * duration;
-            }
-        });
-    }
-
 </script>
 </body>
 </html>
