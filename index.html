@@ -180,7 +180,8 @@
     </div>
 	</div>
 <script>
-    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin, ScrollSmoother);
+    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+	gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
     // create the scrollSmoother before your scrollTriggers
 ScrollSmoother.create({
 	smooth: 1, // how long (in seconds) it takes to "catch up" to the native scroll position
