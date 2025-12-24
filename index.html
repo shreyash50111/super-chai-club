@@ -117,9 +117,7 @@
     <div class="cursor"></div>
     <div class="cursor-follower"></div>
 
-    <div class="preloader">
-        <div class="preloader-text">SUPER CHAI CLUB</div>
-    </div>
+   
         <div id="smooth-wrapper">
 		<div id="smooth-content">
     <nav>
@@ -189,16 +187,9 @@ ScrollSmoother.create({
 	smoothTouch: 0.1 // much shorter smoothing time on touch devices (default is NO smoothing on touch devices)
 });
     // 1. --- PRELOADER & CURSOR ---
-    const preloader = document.querySelector('.preloader');
-    const preloaderText = document.querySelector('.preloader-text');
     const cursor = document.querySelector('.cursor');
     const follower = document.querySelector('.cursor-follower');
 
-    window.addEventListener('load', () => {
-        const tl = gsap.timeline();
-        tl.from(preloaderText, { y: 100, opacity: 0, duration: 1, ease: "power4.out" })
-          .to(preloader, { autoAlpha: 0, duration: 1, ease: "power2.inOut", delay: 0.5 })
-          .set(preloader, { display: 'none' });
     });
 
     document.addEventListener('mousemove', (e) => {
